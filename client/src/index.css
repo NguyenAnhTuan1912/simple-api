@@ -1,3 +1,7 @@
+/* Import styles */
+@import url("./styles/color.css");
+@import url("./styles/button.css");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -6,8 +10,9 @@
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
 }
 
-body {
+* {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  color: var(--clr-onBackground);
 }

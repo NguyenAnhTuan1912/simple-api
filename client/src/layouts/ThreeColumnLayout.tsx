@@ -1,9 +1,9 @@
-import React from 'react'
+// import React from 'react'
 
 type ThreeColumnLayoutProps = {
-  leftSide: () => JSX.Element | JSX.Element;
-  rightSide: () => JSX.Element | JSX.Element;
-  mainSide: () => JSX.Element | JSX.Element;
+  leftSide: (() => JSX.Element) | JSX.Element;
+  rightSide: (() => JSX.Element) | JSX.Element;
+  mainSide: (() => JSX.Element) | JSX.Element;
 }
 
 export default function ThreeColumnLayout(props: ThreeColumnLayoutProps) {

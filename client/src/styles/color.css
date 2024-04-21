@@ -1,0 +1,49 @@
+/* Background Color */
+.background-primary {
+  background-color: var(--clr-primary);
+}
+
+.background-onPrimary {
+  background-color: var(--clr-onPrimary);
+}
+
+.background-outline {
+  background-color: var(--clr-outline);
+}
+
+.background-onOutline {
+  background-color: var(--clr-onOutline);
+}
+
+.background-background {
+  background-color: var(--clr-background);
+}
+
+.background-onBackground {
+  background-color: var(--clr-onBackground);
+}
+
+/* Text Color */
+.text-primary {
+  color: var(--clr-primary);
+}
+
+.text-onPrimary {
+  color: var(--clr-onPrimary);
+}
+
+.text-outline {
+  color: var(--clr-outline);
+}
+
+.text-onOutline {
+  color: var(--clr-onOutline);
+}
+
+.text-background {
+  color: var(--clr-background);
+}
+
+.text-onBackground {
+  color: var(--clr-onBackground);
+}

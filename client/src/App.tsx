@@ -1,4 +1,8 @@
+import React from 'react';
 import { Route, Routes, Navigate } from 'react-router-dom';
+
+// Import classes
+import { Theme } from './classes/Theme';
 
 // Import layouts
 import MainLayout from './layouts/MainLayout';
@@ -12,6 +16,11 @@ import DocumentPage from './pages/DocumentPage';
 import { RouteNames } from './routenames';
 
 function App() {
+  // Enable theme
+  React.useEffect(function() {
+    Theme.enableTheme("light");
+  }, []);
+
   return (
     <Routes>
       <Route path="/" element={<MainLayout />}>

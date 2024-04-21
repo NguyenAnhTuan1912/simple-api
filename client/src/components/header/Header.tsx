@@ -11,7 +11,7 @@ export default function Header() {
       if(index === 0) return;
 
       return (
-        <li className="mx-2 font-semibold hover:text-blue-500">
+        <li key={key} className="mx-2 font-semibold hover:text-blue-500">
           {
             <Link to={RouteNames[key as (keyof typeof RouteNames)].Path}>{RouteNames[key as (keyof typeof RouteNames)].Name}</Link>
           }

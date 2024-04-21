@@ -1,3 +1,5 @@
+// Base Class
+
 export class API {
   base!: string;
 

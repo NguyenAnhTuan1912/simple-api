@@ -69,8 +69,20 @@ function updateObject(o: any, data: any, opt: UpdateObjectOptionsType) {
   return o;
 }
 
+/**
+ * Use this function to lock an object. It uses `freeze` and `seal` to perform this operation
+ * @param o 
+ * @returns 
+ */
+function lock(o: any) {
+  if(typeof o !== "object" || Array.isArray(o)) return;
+  Object.seal(o);
+  Object.freeze(o);
+}
+
 export const ObjectUtils = {
   toString,
   setDefaultValues,
-  updateObject
+  updateObject,
+  lock
 };

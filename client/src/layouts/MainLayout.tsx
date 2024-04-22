@@ -8,7 +8,7 @@ export default function MainLayout() {
   return (
     <>
       <Header />
-      <div className="p-4 m-auto w-full max-w-[1440px]">
+      <div className="p-4 m-auto w-full">
         <Outlet />
       </div>
     </>

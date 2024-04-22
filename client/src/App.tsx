@@ -33,12 +33,12 @@ function App() {
           path={RouteNames.TestAPI.Path}
           element={<TestAPIPage />}
         />
-        <Route
-          path={RouteNames.Document.Path}
-          element={<DocumentPage />}
-        />
         <Route path="/" element={<Navigate to="/home" replace />} />
       </Route>
+      <Route
+        path={RouteNames.Document.Path}
+        element={<DocumentPage />}
+      />
     </Routes>
   )
 }

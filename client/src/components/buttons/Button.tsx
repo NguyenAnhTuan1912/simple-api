@@ -1,7 +1,7 @@
 // import React from 'react'
 
 // Import classes
-// import { Theme } from 'src/classes/Theme'
+import { __ThemePropertyNames } from 'src/classes/Theme'
 
 // Import types
 // import type { ThemeNames } from 'src/classes/Theme';
@@ -13,6 +13,33 @@ const __BorderRadiusTypes: {[key in Button_BorderRadiusTypes]: string} = {
   full_rounded: "p-4 rounded-[100%]"
 }
 
+const __Colors: {[N in keyof typeof __ThemePropertyNames]: { bg: string, text: string }} = {
+  "primary": {
+    bg: "bg-primary focus:non-outline focus:ring focus:ring-outline",
+    text: "text-on-primary"
+  },
+  "onPrimary": {
+    bg: "",
+    text: "text-"
+  },
+  "outline": {
+    bg: "",
+    text: "text-"
+  },
+  "onOutline": {
+    bg: "",
+    text: "text-"
+  },
+  "background": {
+    bg: "",
+    text: "text-"
+  },
+  "onBackground": {
+    bg: "",
+    text: "text-"
+  }
+}
+
 function appendBorderRadius(className: string, type: Button_BorderRadiusTypes | undefined) {
   if(!type) return className;
   return className + " " + __BorderRadiusTypes[type];
@@ -20,8 +47,7 @@ function appendBorderRadius(className: string, type: Button_BorderRadiusTypes | 
 
 function appendColor(className: string, type: Button_ColorTypes) {
   if(!type) return className;
-  const bgColor = "background-" + type;
-  return className + " " + bgColor;
+  return className + " " + __Colors[type].bg + " " + __Colors[type].text;
 }
 
 export default function Button({

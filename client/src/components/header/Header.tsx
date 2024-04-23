@@ -2,10 +2,18 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { GrGithub } from "react-icons/gr";
 
-// Import route names
-import { RouteNames } from 'src/routenames'
+// Import components
+import Button from '../buttons/Button';
 
-export default function Header() {
+// Import route names
+import { RouteNames } from 'src/routenames';
+
+import { openNavSideMenu } from '../side_menu/SideMenu';
+
+// Import types
+import type { HeaderProps } from './Header.props';
+
+export default function Header(props: HeaderProps) {
   const NavItem_Elements = React.useMemo(() => {
     return Object.keys(RouteNames).map(function(key: string, index: number) {
       if(index === 0) return;
@@ -23,21 +31,47 @@ export default function Header() {
   return (
     <header className="border-b">
       <div className="flex justify-between p-4 m-auto w-full max-w-[1440px]">
-        <h1 className="font-semibold text-xl">
-          <Link to={"/"}>Simple API</Link>
-        </h1>
-        <div className="flex items-center">
-          <nav className="border-r me-6 px-3">
-            <ul className="flex flex-row">
-              {
-                NavItem_Elements
-              }
-            </ul>
-          </nav>
-          <a href="https://github.com/NguyenAnhTuan1912/simple-api" target="_blank">
-            <GrGithub className="text-2xl cursor-pointer hover:bg-salte-50" />
-          </a>
-        </div>
+        {
+          !props.leftSide
+            ? (
+              <div>
+                <h1 className="font-semibold text-xl">
+                  <Link to={"/"}>Simple API</Link>
+                </h1>
+              </div>
+            )
+            : typeof props.leftSide === "function"
+              ? props.leftSide()
+              : props.leftSide
+        }
+        {
+          !props.rightSide
+            ? (
+              <div className="flex items-center">
+                <nav className="border-r me-6 px-3 hidden sm:block">
+                  <ul className="flex flex-row">
+                    {
+                      NavItem_Elements
+                    }
+                  </ul>
+                </nav>
+                <a className="hidden sm:block" href="https://github.com/NguyenAnhTuan1912/simple-api" target="_blank">
+                  <GrGithub className="text-2xl cursor-pointer hover:bg-salte-50" />
+                </a>
+                <Button
+                  colorType="onPrimary"
+                  buttonType="normal"
+                  extendClassName="flex p-2 me-3 rounded sm:hidden"
+                  onClick={() => openNavSideMenu()}
+                >
+                  <span className="material-symbols-outlined text-primary bg-on-primary">more_vert</span>
+                </Button>
+              </div>
+            )
+            : typeof props.rightSide === "function"
+              ? props.rightSide(NavItem_Elements)
+              : props.rightSide
+        }
       </div>
     </header>
   )

@@ -5,9 +5,9 @@ import { __ThemePropertyNames } from 'src/classes/Theme'
 
 // Import types
 // import type { ThemeNames } from 'src/classes/Theme';
-import type { ButtonProps, Button_BorderRadiusTypes, Button_ColorTypes } from './Button.props';
+import type { ButtonProps, Button_Types, Button_ColorTypes } from './Button.props';
 
-const __BorderRadiusTypes: {[key in Button_BorderRadiusTypes]: string} = {
+const __BorderRadiusTypes: {[key in Button_Types]: string} = {
   normal: "",
   rounded: "px-4 py-3 rounded-lg",
   full_rounded: "p-4 rounded-[100%]"
@@ -19,28 +19,28 @@ const __Colors: {[N in keyof typeof __ThemePropertyNames]: { bg: string, text: s
     text: "text-on-primary"
   },
   "onPrimary": {
-    bg: "",
-    text: "text-"
+    bg: "bg-on-primary focus:non-outline focus:ring focus:ring-outline",
+    text: "text-primary"
   },
   "outline": {
-    bg: "",
-    text: "text-"
+    bg: "bg-outline focus:non-outline focus:ring focus:ring-outline",
+    text: "text-on-outline"
   },
   "onOutline": {
-    bg: "",
-    text: "text-"
+    bg: "bg-on-outline focus:non-outline focus:ring focus:ring-outline",
+    text: "text-outline"
   },
   "background": {
-    bg: "",
-    text: "text-"
+    bg: "bg-background focus:non-outline focus:ring focus:ring-outline",
+    text: "text-background"
   },
   "onBackground": {
-    bg: "",
-    text: "text-"
+    bg: "bg-on-background focus:non-outline focus:ring focus:ring-outline",
+    text: "text-on-background"
   }
 }
 
-function appendBorderRadius(className: string, type: Button_BorderRadiusTypes | undefined) {
+function appendBorderRadius(className: string, type: Button_Types | undefined) {
   if(!type) return className;
   return className + " " + __BorderRadiusTypes[type];
 }
@@ -51,13 +51,16 @@ function appendColor(className: string, type: Button_ColorTypes) {
 }
 
 export default function Button({
-  borderRadiusType = "rounded",
+  buttonType = "rounded",
   colorType = "primary",
-  extendClassName = "",
+  extendClassName,
   ...props
 }: ButtonProps) {
-  let className = appendBorderRadius(extendClassName, borderRadiusType);
+  let className = appendBorderRadius("", buttonType);
   className = appendColor(className, colorType);
+
+  className += extendClassName ? " " + extendClassName : "";
+  className = className.trim();
 
   return (
     <button

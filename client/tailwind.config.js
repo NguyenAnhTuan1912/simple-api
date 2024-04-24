@@ -1,11 +1,16 @@
+import { Theme } from "./src/objects/Theme";
+
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: ["class", '[class*="dark"]'],
   content: [
     "./index.html",
-    "./src/**/*.{html,tsx,ts}"
+    "./src/**/*.{js,ts,jsx,tsx}"
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: Theme.getTailwindColorsTheme()
+    },
   },
   plugins: [],
 }

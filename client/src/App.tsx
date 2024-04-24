@@ -1,33 +1,77 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React from 'react';
+import { Route, Routes, Navigate } from 'react-router-dom';
+import { TunangnModal } from 'tunangn-react-modal';
+
+// Import layouts
+import MainLayout from './layouts/MainLayout';
+
+// Import pages
+import HomePage from './pages/HomePage';
+import TestAPIPage from './pages/TestAPIPage';
+import DocumentPage from './pages/DocumentPage';
+
+// Import components
+import NavSide from './components/sides/NavSide';
+import ContentSide from './components/sides/ContentSide';
+import DocumentContent from './components/document_content/DocumentContent';
+
+import { __SideMenuNames } from './components/sides/utils';
+
+// Import route names
+import { RouteNames } from './routenames';
+
+// Import themes
+import { Theme } from './objects/Theme';
+import { NormalTheme } from './themes/normal';
 
 function App() {
-  const [count, setCount] = useState(0)
+  // Enable theme
+  React.useEffect(function() {
+    // Initialize CSS Variables for Theme Properties
+    // Theme.initializeCSSVariables();
+
+    // Install theme
+    Theme.install(NormalTheme);
+
+    // Enable theme
+    NormalTheme.enable("light");
+  }, []);
 
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <Routes>
+        <Route path="/" element={<MainLayout />}>
+          <Route
+            path={RouteNames.Home.Path}
+            element={<HomePage />}
+          />
+          <Route
+            path={RouteNames.TestAPI.Path}
+            element={<TestAPIPage />}
+          />
+          <Route path="/" element={<Navigate to="/home" replace />} />
+        </Route>
+        <Route path={RouteNames.Document.Path} element={<DocumentPage />}>
+          <Route
+            path="*"
+            element={<DocumentContent />}
+          />
+        </Route>
+      </Routes>
+      <TunangnModal
+        items={{
+          [__SideMenuNames.ContentSide]: {
+            element: ContentSide,
+            placeOn: "left",
+            type: "side"
+          },
+          [__SideMenuNames.NavSide]: {
+            element: NavSide,
+            placeOn: "right",
+            type: "side"
+          }
+        }}
+      />
     </>
   )
 }

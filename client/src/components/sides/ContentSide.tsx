@@ -1,30 +1,31 @@
-import React from 'react'
-import { Outlet, useNavigate } from 'react-router-dom';
-
-// Import apis
-// import { Docs_API } from 'src/apis';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 // Import hooks
 import { useDocumentOutline } from 'src/hooks/useDocumentOutlineState';
-import { useStateWESSFns } from 'src/hooks/useStateWESSFns';
 
 // Import layouts
-import ThreeColumnLayout from 'src/layouts/ThreeColumnLayout';
+import SideLayout from 'src/layouts/SideLayout';
 
 // Import components
-import Dropdown from 'src/components/dropdown/Dropdown';
+import Dropdown from '../dropdown/Dropdown';
 
 // Import route names
 import { RouteNames } from 'src/routenames';
 
-import { DocumentPageLocalState as __LOCALSTATE__ } from './states/DocumentPage';
-
 // Import types
+import type { CustomizedModalItemProps } from 'tunangn-react-modal';
 import type { DocumentOutlineItemData } from 'src/apis/docs';
 
-export default function DocumentPage() {
+/**
+ * __Composition__
+ * 
+ * Component renders a side menu or drawer.
+ * @param props 
+ * @returns 
+ */
+export default function ContentSide(props: CustomizedModalItemProps) {
   const { documentOutline, documentOutlineDispatcher } = useDocumentOutline();
-  const [state, stateFns] = useStateWESSFns(__LOCALSTATE__.getInitialState(), __LOCALSTATE__.getStateFns);
   const navigate = useNavigate();
 
   React.useEffect(function() {
@@ -32,8 +33,13 @@ export default function DocumentPage() {
   }, []);
 
   return (
-    <ThreeColumnLayout
-      leftSide={(
+    <SideLayout
+      titleElement={(
+        <h1 className="font-bold text-2xl">
+          Nội dung
+        </h1>
+      )}
+      bodyElement={(
         <div className="p-4">
           {
             documentOutline.data.map(function(data, index) {
@@ -54,16 +60,7 @@ export default function DocumentPage() {
           }
         </div>
       )}
-      mainSide={(
-        <div className="max-w-[960px] mx-auto p-4">
-          <Outlet />
-        </div>
-      )}
-      rightSide={(
-        <div className="p-4">
-          <h1>Tổng quan</h1>
-        </div>
-      )}
+      modalItemProps={props}
     />
   )
 }

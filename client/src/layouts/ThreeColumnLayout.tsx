@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import Header from "src/components/header/Header";
 import Button from "src/components/buttons/Button";
 
-import { openContentSideMenu } from "src/components/side_menu/SideMenu";
+import { openContentSideMenu } from "src/components/sides/utils";
 
 type ThreeColumnLayoutProps = {
   leftSide: (() => JSX.Element) | JSX.Element;
@@ -14,9 +14,9 @@ type ThreeColumnLayoutProps = {
 }
 
 const __classNames = {
-  main: "w-full bg-red-100",
-  left: "w-80 shrink-0 bg-blue-100 max-lg:hidden",
-  right: "w-80 shrink-0 bg-green-100 max-xl:hidden"
+  main: "w-full",
+  left: "w-80 shrink-0 max-lg:hidden",
+  right: "w-80 shrink-0 max-xl:hidden"
 }
 
 // Freeze and Seal

@@ -10,6 +10,5 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  color: var(--color-on-background);
-  background-color: var(--color-background);
+  color: rgb(var(--color-on-background));
 }

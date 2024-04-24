@@ -10,5 +10,6 @@ export type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   extendClassName?: string;
   buttonType?: Button_Types;
   colorType?: Button_ColorTypes;
-  hasPadding?: boolean;
+  hasFocusOutline?: boolean;
+  // hasPadding?: boolean;
 };

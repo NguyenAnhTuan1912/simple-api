@@ -29,7 +29,7 @@ export default function SideLayout(props: SideLayoutProps) {
         height: "100dvh",
         maxWidth: "475px",
         minWidth: "300px",
-        background: "var(--color-background)",
+        background: "rgb(var(--color-background))",
         overflow: "auto"
       })}
     >

@@ -1,4 +1,4 @@
-import { Theme } from "./src/classes/Theme";
+import { Theme } from "./src/objects/Theme";
 
 /** @type {import('tailwindcss').Config} */
 export default {
@@ -9,7 +9,7 @@ export default {
   ],
   theme: {
     extend: {
-      colors: (new Theme()).getColors()
+      colors: Theme.getTailwindColorsTheme()
     },
   },
   plugins: [],

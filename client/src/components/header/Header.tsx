@@ -8,7 +8,7 @@ import Button from '../buttons/Button';
 // Import route names
 import { RouteNames } from 'src/routenames';
 
-import { openNavSideMenu } from '../side_menu/SideMenu';
+import { openNavSideMenu } from '../sides/utils';
 
 // Import types
 import type { HeaderProps } from './Header.props';
@@ -30,7 +30,7 @@ export default function Header(props: HeaderProps) {
 
   return (
     <header className="border-b">
-      <div className="flex justify-between p-4 m-auto w-full max-w-[1440px]">
+      <div className="flex justify-between p-4 m-auto w-full">
         {
           !props.leftSide
             ? (

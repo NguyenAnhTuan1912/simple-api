@@ -2,9 +2,6 @@ import React from 'react';
 import { Route, Routes, Navigate } from 'react-router-dom';
 import { TunangnModal } from 'tunangn-react-modal';
 
-// Import classes
-import { Theme } from './classes/Theme';
-
 // Import layouts
 import MainLayout from './layouts/MainLayout';
 
@@ -14,18 +11,30 @@ import TestAPIPage from './pages/TestAPIPage';
 import DocumentPage from './pages/DocumentPage';
 
 // Import components
-import NavSideMenu from './components/side_menu/NavSideMenu';
-import ContentSideMenu from './components/side_menu/ContentSideMenu';
+import NavSide from './components/sides/NavSide';
+import ContentSide from './components/sides/ContentSide';
+import DocumentContent from './components/document_content/DocumentContent';
 
-import { __SideMenuNames } from './components/side_menu/SideMenu';
+import { __SideMenuNames } from './components/sides/utils';
 
 // Import route names
 import { RouteNames } from './routenames';
 
+// Import themes
+import { Theme } from './objects/Theme';
+import { NormalTheme } from './themes/normal';
+
 function App() {
   // Enable theme
   React.useEffect(function() {
-    Theme.enableTheme("light");
+    // Initialize CSS Variables for Theme Properties
+    // Theme.initializeCSSVariables();
+
+    // Install theme
+    Theme.install(NormalTheme);
+
+    // Enable theme
+    NormalTheme.enable("light");
   }, []);
 
   return (
@@ -35,7 +44,6 @@ function App() {
           <Route
             path={RouteNames.Home.Path}
             element={<HomePage />}
-            
           />
           <Route
             path={RouteNames.TestAPI.Path}
@@ -43,20 +51,22 @@ function App() {
           />
           <Route path="/" element={<Navigate to="/home" replace />} />
         </Route>
-        <Route
-          path={RouteNames.Document.Path}
-          element={<DocumentPage />}
-        />
+        <Route path={RouteNames.Document.Path} element={<DocumentPage />}>
+          <Route
+            path="*"
+            element={<DocumentContent />}
+          />
+        </Route>
       </Routes>
       <TunangnModal
         items={{
           [__SideMenuNames.ContentSide]: {
-            element: ContentSideMenu,
+            element: ContentSide,
             placeOn: "left",
             type: "side"
           },
           [__SideMenuNames.NavSide]: {
-            element: NavSideMenu,
+            element: NavSide,
             placeOn: "right",
             type: "side"
           }

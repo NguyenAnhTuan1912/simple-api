@@ -1,8 +1,5 @@
 // import React from 'react'
 
-// Import classes
-import { __ThemePropertyNames } from 'src/classes/Theme'
-
 // Import types
 // import type { ThemeNames } from 'src/classes/Theme';
 import type { ButtonProps, Button_Types, Button_ColorTypes } from './Button.props';
@@ -13,29 +10,29 @@ const __BorderRadiusTypes: {[key in Button_Types]: string} = {
   full_rounded: "p-4 rounded-[100%]"
 }
 
-const __Colors: {[N in keyof typeof __ThemePropertyNames]: { bg: string, text: string }} = {
+const __Colors: {[N in keyof Button_ColorTypes]: { bg: string, text: string }} = {
   "primary": {
-    bg: "bg-primary focus:non-outline focus:ring focus:ring-outline",
+    bg: "bg-primary focus:non-outline",
     text: "text-on-primary"
   },
   "onPrimary": {
-    bg: "bg-on-primary focus:non-outline focus:ring focus:ring-outline",
+    bg: "bg-on-primary focus:non-outline",
     text: "text-primary"
   },
   "outline": {
-    bg: "bg-outline focus:non-outline focus:ring focus:ring-outline",
+    bg: "bg-outline focus:non-outline",
     text: "text-on-outline"
   },
   "onOutline": {
-    bg: "bg-on-outline focus:non-outline focus:ring focus:ring-outline",
+    bg: "bg-on-outline focus:non-outline",
     text: "text-outline"
   },
   "background": {
-    bg: "bg-background focus:non-outline focus:ring focus:ring-outline",
+    bg: "bg-background focus:non-outline",
     text: "text-background"
   },
   "onBackground": {
-    bg: "bg-on-background focus:non-outline focus:ring focus:ring-outline",
+    bg: "bg-on-background focus:non-outline",
     text: "text-on-background"
   }
 }
@@ -53,11 +50,14 @@ function appendColor(className: string, type: Button_ColorTypes) {
 export default function Button({
   buttonType = "rounded",
   colorType = "primary",
+  hasFocusOutline = true,
   extendClassName,
   ...props
 }: ButtonProps) {
   let className = appendBorderRadius("", buttonType);
   className = appendColor(className, colorType);
+
+  if(hasFocusOutline) className += " " + "focus:ring focus:ring-outline";
 
   className += extendClassName ? " " + extendClassName : "";
   className = className.trim();

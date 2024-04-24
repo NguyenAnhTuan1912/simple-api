@@ -17,7 +17,7 @@ import type { CustomizedModalItemProps } from 'tunangn-react-modal';
  * @param props 
  * @returns 
  */
-export default function NavSideMenu(props: CustomizedModalItemProps) {
+export default function NavSide(props: CustomizedModalItemProps) {
   const NavItem_Elements = React.useMemo(() => {
     return Object.keys(RouteNames).map(function(key: string, index: number) {
       if(index === 0) return;

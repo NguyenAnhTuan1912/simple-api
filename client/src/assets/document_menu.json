@@ -1,0 +1,18 @@
+{
+  "data": [
+    {
+      "title": "Tổng quan",
+      "value": "general",
+      "items": [
+        {
+          "title": "Cài đặt",
+          "value": "install"
+        },
+        {
+          "title": "Về dự án",
+          "value": "about"
+        }
+      ]
+    }
+  ]
+}

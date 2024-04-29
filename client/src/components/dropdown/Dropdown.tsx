@@ -1,13 +1,16 @@
-import React from 'react'
+import React from 'react';
+import cn from 'classnames';
 
 // Import hooks
-import { useStateWESSFns } from 'src/hooks/useStateWESSFns'
+import { useStateWESSFns } from 'src/hooks/useStateWESSFns';
+
+// Import components
+import Button from '../buttons/Button';
 
 // Import types
 import type { DropdownProps } from './Dropdown.props'
 
 import { DropdownLocalState as __LOCALSTATE__ } from './state/Dropdown';
-import Button from '../buttons/Button';
 
 export default function Dropdown<N>(props: DropdownProps<N>) {
   const [state, stateFns] = useStateWESSFns(__LOCALSTATE__.getInitialState(), __LOCALSTATE__.getStateFns);
@@ -30,17 +33,34 @@ export default function Dropdown<N>(props: DropdownProps<N>) {
     })
   }, []);
 
+  React.useEffect(function() {
+    if(props.selectedValue) {
+      stateFns.updateSelectedItem(props.topValue);
+      stateFns.setIsOpen(true);
+    }
+  }, []);
+
   return (
     <section>
       <Button
         colorType="background"
         extendClassName="flex justify-between w-full hover:bg-primary/10"
         hasFocusOutline={false} 
-        onClick={function() { stateFns.toggleIsOpen() }}
+        onClick={function() {
+          stateFns.updateSelectedItem(props.topValue);
+          stateFns.toggleIsOpen();
+          props.onSelectTop(props.topValue);
+        }}
       >
-        <h1 className="uppercase">{props.title}</h1>
+        <h1 className="font-bold uppercase text-lg">{props.title}</h1>
         {/* <span className="material-symbols-outlined">{state.isOpen ? "expand_more" : "chevron_right"}</span> */}
-        <span className={"material-symbols-outlined" + (state.isOpen ? " rotate-90" : "")}>chevron_right</span>
+        <span
+          className={
+            cn("material-symbols-outlined", { "rotate-90": state.isOpen, "": !state.isOpen })
+          }
+        >
+          chevron_right
+        </span>
       </Button>
       {
         state.isOpen && (<ul>{__Items}</ul>)

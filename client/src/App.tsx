@@ -13,7 +13,6 @@ import DocumentPage from './pages/DocumentPage';
 // Import components
 import NavSide from './components/sides/NavSide';
 import ContentSide from './components/sides/ContentSide';
-import DocumentContent from './components/document_content/DocumentContent';
 
 import { __SideMenuNames } from './components/sides/utils';
 
@@ -51,12 +50,7 @@ function App() {
           />
           <Route path="/" element={<Navigate to="/home" replace />} />
         </Route>
-        <Route path={RouteNames.Document.Path} element={<DocumentPage />}>
-          <Route
-            path="*"
-            element={<DocumentContent />}
-          />
-        </Route>
+        <Route path={RouteNames.Document.Path + "/*"} element={<DocumentPage />} />
       </Routes>
       <TunangnModal
         items={{

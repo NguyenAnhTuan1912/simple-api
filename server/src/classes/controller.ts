@@ -13,14 +13,14 @@ export type MiddlewareFunction = (req: Request, res: Response, next: NextFunctio
 export class Controller {
   static ReservedMethods = ["constructor", "buildWithMiddlewares"];
 
-  db!: Databases;
-  sv!: Services;
-  utils!: Utils;
-  midws!: Middlewares;
+  protected dbs!: Databases;
+  protected sv!: Services;
+  protected utils!: Utils;
+  protected midws!: Middlewares;
   withMiddlewares!: Map<string, Array<MiddlewareFunction | HandlerFunction>>;
 
-  constructor(db: Databases, sv: Services, utils: Utils, midws: Middlewares) {
-    this.db = db;
+  constructor(dbs: Databases, sv: Services, utils: Utils, midws: Middlewares) {
+    this.dbs = dbs;
     this.sv = sv;
     this.utils = utils;
     this.midws = midws;

@@ -11,10 +11,10 @@ import type { HTTPMethods } from "src/types/http.types";
 import type { Middlewares } from "src/middlewares";
 
 export class Module {
-  utils!: Utils;
-  base!: string;
-  controllers!: {[key: string]: Controller};
-  midws!: Middlewares;
+  protected utils!: Utils;
+  protected base!: string;
+  protected controllers!: {[key: string]: Controller};
+  protected midws!: Middlewares;
 
   constructor(base: string, utils: Utils, midws: Middlewares) {
     this.utils = utils;

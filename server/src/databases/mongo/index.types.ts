@@ -29,6 +29,7 @@ export type Mongo_UserResponseData = {
 export type Mongo_BookTypeModelData = {
   id: string;
   name: string;
+  value: string;
 }
 
 export type Mongo_BookAuthorModelData = {
@@ -41,7 +42,7 @@ export type Mongo_BookAuthorModelData = {
 
 export type Mongo_BookModelData = {
   id: string;
-  typeId: Array<string>;
+  typeIds: Array<string>;
   authorId: string;
   name: string;
   desc: string;
@@ -55,4 +56,16 @@ export type Mongo_BookResponseData = {
   name: string;
   desc: string;
   imgs: Array<string>;
+}
+
+export type Mongo_BookQuery = {
+  limit?: string;
+  skip?: string;
+  author?: string;
+  types?: string;
+  fields?: string;
+}
+
+export type Mongo_BookParams = {
+  id: string;
 }

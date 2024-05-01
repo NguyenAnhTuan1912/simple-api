@@ -1,5 +1,14 @@
-const ConnectionString = {
-  ofMongo(domain: string, username: string, password: string) {
+// Import orther local utils
+import { PipelineUtil } from "./pipeline";
+
+export class MongoUtils {
+  Pipeline!: PipelineUtil;
+
+  constructor() {
+    this.Pipeline = new PipelineUtil();
+  }
+
+  getConnectionString(domain: string, username: string, password: string) {
     if(!domain) {
       console.error("Domain of database is required");
       return;
@@ -18,5 +27,3 @@ const ConnectionString = {
     return `mongodb+srv://${username}:${password}@${domain}/?retryWrites=true&w=majority`;
   }
 }
-
-export { ConnectionString };

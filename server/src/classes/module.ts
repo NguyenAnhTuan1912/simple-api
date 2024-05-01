@@ -43,6 +43,7 @@ export class Module {
       return;
     }
 
+    if(name[0] === "/") name = name.substring(1);
     let path = this.base + "/" + name;
 
     app[method](path, hander);

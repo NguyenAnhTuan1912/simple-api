@@ -11,10 +11,10 @@ import type { Utils } from "src/utils";
 import type { ObjectSchema } from "joi";
 
 export class Database<Instances> implements IDatabase {
-  protected __instances!: Instances;
+  protected instances!: Instances;
 
   constructor() {
-    this.__instances = {} as any;
+    this.instances = {} as any;
   }
 
   async connect(): Promise<void> {};
@@ -33,6 +33,10 @@ export class Model<T> {
 
   async validateDataAsync(data: T) {
     return this.schema.validateAsync(data);
+  }
+
+  getFields() {
+    return Object.keys(this.schema.describe().keys);
   }
 
   get [Symbol.toStringTag]() {

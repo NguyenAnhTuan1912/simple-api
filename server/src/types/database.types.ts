@@ -8,12 +8,12 @@ export interface IDatabase {
 }
 
 export interface IModel<T> {
-  query?<Args>(...args: Array<Args>): Promise<Interchange<T | null>>;
-  create?<Args>(...args: Array<Args>): Promise<Interchange<T | null>>;
-  update?<Args>(...args: Array<Args>): Promise<Interchange<T | null>>;
-  delete?<Args>(...args: Array<Args>): Promise<Interchange<T | null>>;
-  queryMultiply?<Args>(...args: Array<Args>): Promise<Interchange<Array<T> | null>>;
-  createMultiply?<Args>(...args: Array<Args>): Promise<Interchange<T | null>>;
-  updateMultiply?<Args>(...args: Array<Args>): Promise<Interchange<T | null>>;
-  deleteMultiply?<Args>(...args: Array<Args>): Promise<Interchange<T | null>>;
+  query?(...args: Array<any>): Promise<Interchange<T | null>>;
+  create?(...args: Array<any>): Promise<Interchange<T | null>>;
+  update?(...args: Array<any>): Promise<Interchange<T | null>>;
+  delete?(...args: Array<any>): Promise<Interchange<T | null>>;
+  queryMultiply?(...args: Array<any>): Promise<Interchange<Array<T> | null>>;
+  createMultiply?(...args: Array<any>): Promise<Interchange<T | null>>;
+  updateMultiply?(...args: Array<any>): Promise<Interchange<T | null>>;
+  deleteMultiply?(...args: Array<any>): Promise<Interchange<T | null>>;
 }

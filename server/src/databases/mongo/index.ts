@@ -1,7 +1,7 @@
 import { MongoClient } from "mongodb";
 
-// Import utils
-import { ConnectionString } from "../utils/getConnectionString";
+// Import local utils
+import { MongoUtils } from "./utils";
 
 // Import classes
 import { Database } from "../../classes/database";
@@ -27,30 +27,34 @@ export type Mongo_DBInformations = {
 
 export class MongoDatabase extends Database<Mongo_Instances> {
   book!: BookModel;
+  localUtils!: MongoUtils;
 
   constructor(utils: Utils) {
     super();
+    this.localUtils = new MongoUtils();
+
     let cluserNames = Object.keys(__settings);
 
     for(let cluserName of cluserNames) {
-      this.__instances[cluserName as keyof typeof __settings] = new MongoClient(
-        ConnectionString.ofMongo(
+      this.instances[cluserName as keyof typeof __settings] = new MongoClient(
+        this.localUtils.getConnectionString(
           __settings[cluserName as keyof typeof __settings].DOMAIN!,
           __settings[cluserName as keyof typeof __settings].USERNAME!,
           __settings[cluserName as keyof typeof __settings].PASSWORD!
         )!
       )
     }
-    this.book = new BookModel(this.__instances, utils, __settings.SIMPLE_API.DBS);
+
+    this.book = new BookModel(this.instances, utils, this.localUtils, __settings.SIMPLE_API.DBS);
   }
 
   async connect() {
     try {
-      let dbNames = Object.keys(this.__instances);
+      let dbNames = Object.keys(this.instances);
 
       for(let dbName of dbNames) {
         console.log(`  ${dbName} DB - status: connecting`);
-        await this.__instances[dbName as keyof typeof this.__instances].connect();
+        await this.instances[dbName as keyof typeof this.instances].connect();
         console.log(`  ${dbName} DB - status: connected`);
       }
 

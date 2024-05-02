@@ -16,13 +16,13 @@ import { Middlewares } from "./middlewares";
 // Import Utils
 import { Utils } from "./utils";
 // Import Modules
-import { ExampleModule } from "./modules/example.module";
+import { BookModule } from "./modules/book.module";
 
 // Run app
 (async function() {
-  const db = new Databases();
   const sv = new Services();
   const utils = new Utils();
+  const dbs = new Databases(utils);
   const middlewares = new Middlewares(utils);
 
   const serverSettings = {
@@ -31,20 +31,21 @@ import { ExampleModule } from "./modules/example.module";
 
   const myServer = new MyServer(utils, serverSettings);
   const builder = new ServerBuilder(myServer);
-  const example = new ExampleModule(db, sv, utils, middlewares);
+
+  const book = new BookModule(dbs, sv, utils, middlewares);
 
   // Build databases
-  builder.buildDatabases(db);
+  await builder.buildDatabases(dbs);
 
   // Build global middlewares
-  builder.buildGlobalMiddlewares([
+  await builder.buildGlobalMiddlewares([
     cors({ origin: "*" }),
     json(),
     urlencoded({ extended: true })
   ]);
 
   // Build modules
-  builder.buildModules([example]);
+  await builder.buildModules([book]);
 
   if(!builder.canStartup())
     throw new Error("Server can be started up now. Please make sure databases are connected, modules and middlewares are set up");

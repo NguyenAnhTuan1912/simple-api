@@ -50,12 +50,35 @@ export class BookModel extends Model<Mongo_BookModelData> implements IModel<Mong
       // If request has params
       if(!args[1] || !args[1].id) throw new Error("The [id] of book is required");
 
-      const result = await __collection.findOne({ "_id": new ObjectId(args[1].id) });
+      pipeline.push(
+        {
+          "$match": this.__localUtils.Pipeline.getMatchIdQuery(args[1].id)
+        }
+      );
+
+      // If request has queries
+      if(args[0]) {
+        pipeline.push(
+          // Look-up Stage
+          // Get all related documents in `type` collection and merge
+          this.__localUtils.Pipeline.getLookupStage(this.__dbInfo.BOOK.OBJECTS.TYPE, "typeIds", "_id", "types"),
+          // Look-up Stage
+          // Get all related documents in `author` collection and merge
+          this.__localUtils.Pipeline.getLookupStage(this.__dbInfo.BOOK.OBJECTS.AUTHOR, "authorId", "_id", "author"),
+          this.__localUtils.Pipeline.getProjectStage(args[0].fields, ["typeIds", "authorId"]),
+          // Unwind Stage
+          // Extract the first element of `author` to get single value.
+          this.__localUtils.Pipeline.getUnwindStage(this.__dbInfo.BOOK.OBJECTS.AUTHOR)
+        );
+      }
+
+      const cursor = __collection.aggregate(pipeline);
+      const result = await cursor.toArray();
 
       if(!result) throw new Error(`The book with ${args[1].id} id isn't found`);
 
-      data = result as Mongo_BookModelData;
-      message = "Query books successfully";
+      data = result[0] as Mongo_BookModelData;
+      message = "Query book successfully";
     } catch (error: any) {
       code = 0;
       message = error.message;
@@ -76,36 +99,42 @@ export class BookModel extends Model<Mongo_BookModelData> implements IModel<Mong
 
       // If request has queries
       if(args[0]) {
-        let [projectStage] = this.__localUtils.Pipeline.getProjectStage(args[0].fields, ["typeIds", "authorId"]);
-
-        // `author` is an array and I dont want it, so I want to get the first element of author
-        // by using `$unwind`
-        let unwindStage = { "$unwind": "$author" };
+        const matchStage = {
+          "$match": this.__localUtils.Pipeline.and()
+        };
+  
+        // If query has `author`
+        if(args[0].author)
+          matchStage.$match.$and.push(this.__localUtils.Pipeline.getMatchExactQuery("author.name", args[0].author));
+  
+        // If query has `types`
+        if(args[0].types)
+          matchStage.$match.$and.push(
+            this.__localUtils.Pipeline.getMatchElementArrayQuery(
+              "types", this.__localUtils.Pipeline.getMatchArrayQuery("value", args[0].types)
+            )
+          );
 
         pipeline.push(
-          // Look up for types
-          {
-            $lookup: {
-              from: "type",
-              localField: "typeIds",
-              foreignField: "_id",
-              as: "types"
-            }
-          },
-          // Look up for author
-          {
-            $lookup: {
-              from: "author",
-              localField: "authorId",
-              foreignField: "_id",
-              as: "author"
-            }
-          },
-          projectStage,
-          unwindStage,
-          ...this.__localUtils.Pipeline.getLimitnSkipStage(parseInt(args[0].limit || "10"), parseInt(args[0].skip || "0"))
+          // Look-up Stage
+          // Get all related documents in `type` collection and merge
+          this.__localUtils.Pipeline.getLookupStage(this.__dbInfo.BOOK.OBJECTS.TYPE, "typeIds", "_id", "types"),
+          // Look-up Stage
+          // Get all related documents in `author` collection and merge
+          this.__localUtils.Pipeline.getLookupStage(this.__dbInfo.BOOK.OBJECTS.AUTHOR, "authorId", "_id", "author"),
+          this.__localUtils.Pipeline.getProjectStage(args[0].fields, ["typeIds", "authorId"]),
+          // Unwind Stage
+          // Extract the first element of `author` to get single value.
+          this.__localUtils.Pipeline.getUnwindStage(this.__dbInfo.BOOK.OBJECTS.AUTHOR),
+          // Match
+          // Depend on
+          matchStage
         );
       }
+
+      pipeline.push(
+        ...this.__localUtils.Pipeline.getLimitnSkipStage(parseInt(args[0].limit || "10"), parseInt(args[0].skip || "0"))
+      );
 
       const cursor = __collection.aggregate<Mongo_BookModelData>(pipeline);
       data = await cursor.toArray();

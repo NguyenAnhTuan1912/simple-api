@@ -42,8 +42,9 @@ export class BookController extends Controller {
     let message = null;
 
     try {
+      let query = req.query as Mongo_BookQuery;
       let params = req.params as Mongo_BookParams;
-      let result = await this.dbs.mongo.book.query(undefined, params);
+      let result = await this.dbs.mongo.book.query(query, params);
 
       if(!result.code) throw new Error(result.message!);
 

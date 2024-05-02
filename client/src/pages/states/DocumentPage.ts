@@ -5,7 +5,8 @@ export type DropdownStates = ReturnType<typeof getInitialState>;
 
 function getInitialState() {
   return {
-    menu: [] as Array<DocumentOutlineData>
+    menu: [] as Array<DocumentOutlineData>,
+    documentName: ""
   }
 }
 
@@ -15,7 +16,13 @@ function getStateFns(changeState: ChangeStateFnType<DropdownStates>) {
       changeState("menu", function() {
         return data;
       });
-    }
+    },
+
+    setDocumentName(data: string) {
+      changeState("documentName", function() {
+        return data;
+      });
+    },
   }
 }
 

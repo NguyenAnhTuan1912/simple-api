@@ -1,5 +1,5 @@
-import React from 'react'
-import { Outlet, useNavigate } from 'react-router-dom';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 // Import apis
 // import { Docs_API } from 'src/apis';
@@ -13,6 +13,7 @@ import ThreeColumnLayout from 'src/layouts/ThreeColumnLayout';
 
 // Import components
 import Dropdown from 'src/components/dropdown/Dropdown';
+import DocumentContent from 'src/components/document_content/DocumentContent';
 
 // Import route names
 import { RouteNames } from 'src/routenames';
@@ -21,6 +22,16 @@ import { DocumentPageLocalState as __LOCALSTATE__ } from './states/DocumentPage'
 
 // Import types
 import type { DocumentOutlineItemData } from 'src/apis/docs';
+
+function handleOnSelectItemDropdown(navigate: ReturnType<typeof useNavigate>, setDocumentName: any, documentName?: string) {
+  if(documentName !== "" && documentName !== undefined && documentName !== null)
+    navigate(RouteNames.Document.Path + "/" + documentName);
+  else
+  navigate(RouteNames.Document.Path);
+  setDocumentName(documentName);
+}
+
+const __DEFAULT_DOCUMENT_NAME = "general";
 
 export default function DocumentPage() {
   const { documentOutline, documentOutlineDispatcher } = useDocumentOutline();
@@ -42,7 +53,10 @@ export default function DocumentPage() {
                   key={index}
                   title={data.title}
                   items={data.items}
-                  onSelectItem={function(item) { navigate(RouteNames.Document.Path + "/" + item.value) }}
+                  topValue={data.value}
+                  selectedValue={state.documentName || __DEFAULT_DOCUMENT_NAME}
+                  onSelectItem={function(item) { handleOnSelectItemDropdown(navigate, stateFns.setDocumentName, item.value) }}
+                  onSelectTop={function() { handleOnSelectItemDropdown(navigate, stateFns.setDocumentName) }}
                   renderItem={function(item) {
                     return (
                       <h1 className="font-bold">{item.title}</h1>
@@ -56,7 +70,7 @@ export default function DocumentPage() {
       )}
       mainSide={(
         <div className="max-w-[960px] mx-auto p-4">
-          <Outlet />
+          <DocumentContent name={state.documentName ? state.documentName : __DEFAULT_DOCUMENT_NAME} />
         </div>
       )}
       rightSide={(

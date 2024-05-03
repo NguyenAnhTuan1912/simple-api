@@ -6,7 +6,7 @@ import { Utils } from "src/utils";
 
 // Import types
 import type { Express } from "express";
-import type { Controller, MiddlewareFunction, HandlerFunction } from "./controller";
+import type { Controller, MiddlewareFunction, HandlerFunction } from "./Controller";
 import type { HTTPMethods } from "src/types/http.types";
 import type { Middlewares } from "src/middlewares";
 
@@ -43,8 +43,8 @@ export class Module {
       return;
     }
 
-    if(name[0] === "/") name = name.substring(1);
-    let path = this.base + "/" + name;
+    if(name[0] !== "/" && name !== "") name = "/" + name;
+    let path = this.base + name;
 
     app[method](path, hander);
     console.log(`  Endpoint - ${path}, method: ${method} - Done`);

@@ -4,10 +4,12 @@ import { MongoClient } from "mongodb";
 import { MongoUtils } from "./utils";
 
 // Import classes
-import { Database } from "../../classes/database";
+import { Database } from "../../classes/Database";
 
 // Import models
 import { BookModel } from "./models/book.model";
+import { BookAuthorModel } from "./models/book_author.model";
+import { BookTypeModel } from "./models/book_type.model";
 
 // Import settings
 import { AppSettings } from "src/settings";
@@ -25,13 +27,13 @@ export type Mongo_DBInformations = {
   [K in keyof typeof __settings.SIMPLE_API.DBS]: typeof __settings.SIMPLE_API.DBS[K];
 }
 
-export class MongoDatabase extends Database<Mongo_Instances> {
+export class MongoDatabase extends Database<Mongo_Instances, MongoUtils> {
   book!: BookModel;
-  localUtils!: MongoUtils;
+  bookAuthor!: BookAuthorModel;
+  bookType!: BookTypeModel;
 
   constructor(utils: Utils) {
-    super();
-    this.localUtils = new MongoUtils();
+    super(new MongoUtils());
 
     let cluserNames = Object.keys(__settings);
 
@@ -46,6 +48,8 @@ export class MongoDatabase extends Database<Mongo_Instances> {
     }
 
     this.book = new BookModel(this.instances, utils, this.localUtils, __settings.SIMPLE_API.DBS);
+    this.bookAuthor = new BookAuthorModel(this.instances, utils, this.localUtils, __settings.SIMPLE_API.DBS);
+    this.bookType = new BookTypeModel(this.instances, utils, this.localUtils, __settings.SIMPLE_API.DBS);
   }
 
   async connect() {

@@ -1,4 +1,4 @@
-import { Module } from "src/classes/module";
+import { Module } from "src/classes/Module";
 
 import { BookController } from "src/controllers/book.controller";
 

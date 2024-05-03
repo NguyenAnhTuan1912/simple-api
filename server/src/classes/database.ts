@@ -10,11 +10,13 @@ import type { IDatabase } from "src/types/database.types";
 import type { Utils } from "src/utils";
 import type { ObjectSchema } from "joi";
 
-export class Database<Instances> implements IDatabase {
+export class Database<Instances, Utils> implements IDatabase {
   protected instances!: Instances;
+  protected localUtils!: Utils;
 
-  constructor() {
+  constructor(localUtil: Utils) {
     this.instances = {} as any;
+    this.localUtils = localUtil;
   }
 
   async connect(): Promise<void> {};

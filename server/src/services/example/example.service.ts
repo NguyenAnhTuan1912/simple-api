@@ -1,3 +1,3 @@
-import { Service } from "../../classes/service";
+import { Service } from "../../classes/Service";
 
 export class ExampleService extends Service {}

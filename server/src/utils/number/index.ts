@@ -1,4 +1,4 @@
-import { Util } from "src/classes/util";
+import { Util } from "src/classes/Util";
 
 export class NumberUtil extends Util {
   getRandom(min: number = 0, max: number = 10) {

@@ -1,4 +1,4 @@
-import { Middleware } from "src/classes/middleware";
+import { Middleware } from "src/classes/Middleware";
 
 // Import types
 import type { Request, Response, NextFunction } from "express";

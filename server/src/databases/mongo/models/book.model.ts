@@ -1,20 +1,26 @@
 import Joi, { ObjectSchema } from "joi";
 
 // Import classes
-import { Model } from "src/classes/database";
+import { Model } from "src/classes/Database";
 
 // Import mongodb settings
 import { AppSettings } from "src/settings";
 
 // Import types
-import { type Db, type Document, type AggregationCursor, ObjectId } from "mongodb";
+import type { Db } from "mongodb";
 import type { IModel } from "src/types/database.types";
-import type { Mongo_BookModelData, Mongo_BookQuery, Mongo_BookParams } from "../index.types";
+import type {
+  Mongo_BookResponseData,
+  Mongo_BookModelData,
+  Mongo_BookQuery,
+  Mongo_BooksQuery,
+  Mongo_BookParams
+} from "../index.types";
 import type { Utils } from "src/utils";
 import type { MongoUtils } from "../utils";
 import type { Mongo_Instances, Mongo_DBInformations } from "..";
 
-export class BookModel extends Model<Mongo_BookModelData> implements IModel<Mongo_BookModelData> {
+export class BookModel extends Model<Mongo_BookModelData> implements IModel<Mongo_BookResponseData> {
   protected db!: Db;
   private __dbInfo!: Mongo_DBInformations;
   private __localUtils!: MongoUtils;
@@ -38,11 +44,15 @@ export class BookModel extends Model<Mongo_BookModelData> implements IModel<Mong
     this.db = mongos.SIMPLE_API.db(this.__dbInfo.BOOK.NAME);
   }
 
+  getCollection() {
+    return this.__localUtils.getCollection<Mongo_BookModelData>(this.db, this.__dbInfo.BOOK.OBJECTS.BOOK);
+  }
+
   async query(...args: [Mongo_BookQuery?, Mongo_BookParams?]) {
     let code = 1;
     let message: string = "";
-    let data: Mongo_BookModelData | null = [] as any;
-    const __collection = this.db.collection<Mongo_BookModelData>(this.__dbInfo.BOOK.OBJECTS.BOOK);
+    let data: Mongo_BookResponseData | null = [] as any;
+    const __collection = this.getCollection();
     
     try {
       const pipeline = [];
@@ -77,7 +87,7 @@ export class BookModel extends Model<Mongo_BookModelData> implements IModel<Mong
 
       if(!result) throw new Error(`The book with ${args[1].id} id isn't found`);
 
-      data = result[0] as Mongo_BookModelData;
+      data = result[0] as Mongo_BookResponseData;
       message = "Query book successfully";
     } catch (error: any) {
       code = 0;
@@ -88,11 +98,11 @@ export class BookModel extends Model<Mongo_BookModelData> implements IModel<Mong
     }
   }
 
-  async queryMultiply(...args: [Mongo_BookQuery, Mongo_BookParams?]) {
+  async queryMultiply(...args: [Mongo_BooksQuery, Mongo_BookParams?]) {
     let code = 1;
     let message: string = "";
-    let data: Array<Mongo_BookModelData> | null = [] as any;
-    const __collection = this.db.collection<Mongo_BookModelData>(this.__dbInfo.BOOK.OBJECTS.BOOK);
+    let data: Array<Mongo_BookResponseData> | null = [] as any;
+    const __collection = this.getCollection();
     
     try {
       const pipeline = [];
@@ -115,6 +125,9 @@ export class BookModel extends Model<Mongo_BookModelData> implements IModel<Mong
             )
           );
 
+        // If match stage is empty
+        if(matchStage.$match.$and.length === 0) matchStage.$match = {} as any;
+
         pipeline.push(
           // Look-up Stage
           // Get all related documents in `type` collection and merge
@@ -136,7 +149,7 @@ export class BookModel extends Model<Mongo_BookModelData> implements IModel<Mong
         ...this.__localUtils.Pipeline.getLimitnSkipStage(parseInt(args[0].limit || "10"), parseInt(args[0].skip || "0"))
       );
 
-      const cursor = __collection.aggregate<Mongo_BookModelData>(pipeline);
+      const cursor = __collection.aggregate<Mongo_BookResponseData>(pipeline);
       data = await cursor.toArray();
       message = "Query books successfully";
     } catch (error: any) {

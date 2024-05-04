@@ -5,6 +5,11 @@ dotenv.config({ path: [".env", `.env.${process.env.NODE_ENV}`] });
 
 export const AppSettings = {
   PORT: process.env.PORT || "7500",
+  SERCURITY: {
+    ALGORITHM: process.env.CRYPTOGRAPHY_ALGORITHM,
+    KEY: process.env.CRYPTOGRAPHY_KEY,
+    IV: process.env.CRYPTOGRAPHY_IV
+  },
   /**
    * Settings for MongoDBs, this include many clusers, each cluser has many database...
    */
@@ -29,7 +34,8 @@ export const AppSettings = {
           NAME: "user",
           OBJECTS: {
             USER: "user",
-            ROLE: "role"
+            ROLE: "role",
+            TOKEN: "token"
           }
         }
       }

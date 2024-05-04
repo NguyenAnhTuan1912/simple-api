@@ -15,8 +15,8 @@ import type {
 } from "src/databases/mongo/index.types";
 
 export class BookController extends Controller {
-  constructor(dbs: any, sv: any, utils: any, midws: any) {
-    super(dbs, sv, utils, midws);
+  constructor(dbs: any, serv: any, utils: any, midws: any) {
+    super(dbs, serv, utils, midws);
 
     // Add middlewares
     // this.buildWithMiddlewares("get::test", this.midws.Authorize.user);
@@ -40,7 +40,7 @@ export class BookController extends Controller {
       if(code === 200) code = 500;
       message = error.message;
     } finally {
-      return res.status(code).json(this.utils.Http.generateHTTPResponse(code, data, message));
+      return res.status(code).json(this.utils.http.generateHTTPResponse(code, data, message));
     }
   }
 
@@ -62,7 +62,7 @@ export class BookController extends Controller {
       if(code === 200) code = 500;
       message = error.message;
     } finally {
-      return res.status(code).json(this.utils.Http.generateHTTPResponse(code, data, message));
+      return res.status(code).json(this.utils.http.generateHTTPResponse(code, data, message));
     }
   }
 
@@ -84,7 +84,7 @@ export class BookController extends Controller {
       if(code === 200) code = 500;
       message = error.message;
     } finally {
-      return res.status(code).json(this.utils.Http.generateHTTPResponse(code, data, message));
+      return res.status(code).json(this.utils.http.generateHTTPResponse(code, data, message));
     }
   }
 
@@ -110,7 +110,7 @@ export class BookController extends Controller {
       if(code === 200) code = 500;
       message = error.message;
     } finally {
-      return res.status(code).json(this.utils.Http.generateHTTPResponse(code, data, message));
+      return res.status(code).json(this.utils.http.generateHTTPResponse(code, data, message));
     }
   }
 
@@ -133,7 +133,7 @@ export class BookController extends Controller {
       if(code === 200) code = 500;
       message = error.message;
     } finally {
-      return res.status(code).json(this.utils.Http.generateHTTPResponse(code, data, message));
+      return res.status(code).json(this.utils.http.generateHTTPResponse(code, data, message));
     }
   }
 
@@ -156,7 +156,7 @@ export class BookController extends Controller {
       if(code === 200) code = 500;
       message = error.message;
     } finally {
-      return res.status(code).json(this.utils.Http.generateHTTPResponse(code, data, message));
+      return res.status(code).json(this.utils.http.generateHTTPResponse(code, data, message));
     }
   }
 }

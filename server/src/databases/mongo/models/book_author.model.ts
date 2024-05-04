@@ -42,7 +42,7 @@ export class BookAuthorModel extends Model<Mongo_BookAuthorModelData> implements
     this.db = mongos.SIMPLE_API.db(this.__dbInfo.BOOK.NAME);
   }
 
-  getCollection() {
+  private __getCollection() {
     return this.__localUtils.getCollection<Mongo_BookAuthorModelData>(this.db, this.__dbInfo.BOOK.OBJECTS.AUTHOR);
   }
 
@@ -50,7 +50,7 @@ export class BookAuthorModel extends Model<Mongo_BookAuthorModelData> implements
     let code = 1;
     let message: string = "";
     let data: Mongo_BookAuthorModelData | null = [] as any;
-    const __collection = this.getCollection();
+    const __collection = this.__getCollection();
 
     try {
       const pipeline = [];
@@ -83,7 +83,7 @@ export class BookAuthorModel extends Model<Mongo_BookAuthorModelData> implements
       message = error.message;
       data = null;
     } finally {
-      return this.utils.Http.generateInterchange(code, message, data);
+      return this.utils.http.generateInterchange(code, message, data);
     }
   }
 
@@ -91,7 +91,7 @@ export class BookAuthorModel extends Model<Mongo_BookAuthorModelData> implements
     let code = 1;
     let message: string = "";
     let data: Array<Mongo_BookAuthorModelData> | null = [] as any;
-    const __collection = this.getCollection();
+    const __collection = this.__getCollection();
     
     try {
       const pipeline = [];
@@ -127,7 +127,7 @@ export class BookAuthorModel extends Model<Mongo_BookAuthorModelData> implements
       message = error.message;
       data = null;
     } finally {
-      return this.utils.Http.generateInterchange(code, message, data);
+      return this.utils.http.generateInterchange(code, message, data);
     }
   }
 }

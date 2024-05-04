@@ -44,7 +44,7 @@ export class BookModel extends Model<Mongo_BookModelData> implements IModel<Mong
     this.db = mongos.SIMPLE_API.db(this.__dbInfo.BOOK.NAME);
   }
 
-  getCollection() {
+  private __getCollection() {
     return this.__localUtils.getCollection<Mongo_BookModelData>(this.db, this.__dbInfo.BOOK.OBJECTS.BOOK);
   }
 
@@ -52,7 +52,7 @@ export class BookModel extends Model<Mongo_BookModelData> implements IModel<Mong
     let code = 1;
     let message: string = "";
     let data: Mongo_BookResponseData | null = [] as any;
-    const __collection = this.getCollection();
+    const __collection = this.__getCollection();
     
     try {
       const pipeline = [];
@@ -94,7 +94,7 @@ export class BookModel extends Model<Mongo_BookModelData> implements IModel<Mong
       message = error.message;
       data = null;
     } finally {
-      return this.utils.Http.generateInterchange(code, message, data);
+      return this.utils.http.generateInterchange(code, message, data);
     }
   }
 
@@ -102,7 +102,7 @@ export class BookModel extends Model<Mongo_BookModelData> implements IModel<Mong
     let code = 1;
     let message: string = "";
     let data: Array<Mongo_BookResponseData> | null = [] as any;
-    const __collection = this.getCollection();
+    const __collection = this.__getCollection();
     
     try {
       const pipeline = [];
@@ -157,7 +157,7 @@ export class BookModel extends Model<Mongo_BookModelData> implements IModel<Mong
       message = error.message;
       data = null;
     } finally {
-      return this.utils.Http.generateInterchange(code, message, data);
+      return this.utils.http.generateInterchange(code, message, data);
     }
   }
 }

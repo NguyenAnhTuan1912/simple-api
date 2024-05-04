@@ -10,6 +10,8 @@ import { Database } from "../../classes/Database";
 import { BookModel } from "./models/book.model";
 import { BookAuthorModel } from "./models/book_author.model";
 import { BookTypeModel } from "./models/book_type.model";
+import { TokenModel } from "./models/token.model";
+import { UserRoleModel } from "./models/user_role.model";
 
 // Import settings
 import { AppSettings } from "src/settings";
@@ -32,6 +34,9 @@ export class MongoDatabase extends Database<Mongo_Instances, MongoUtils> {
   bookAuthor!: BookAuthorModel;
   bookType!: BookTypeModel;
 
+  userRole!: UserRoleModel;
+  token!: TokenModel;
+
   constructor(utils: Utils) {
     super(new MongoUtils());
 
@@ -50,6 +55,8 @@ export class MongoDatabase extends Database<Mongo_Instances, MongoUtils> {
     this.book = new BookModel(this.instances, utils, this.localUtils, __settings.SIMPLE_API.DBS);
     this.bookAuthor = new BookAuthorModel(this.instances, utils, this.localUtils, __settings.SIMPLE_API.DBS);
     this.bookType = new BookTypeModel(this.instances, utils, this.localUtils, __settings.SIMPLE_API.DBS);
+    this.userRole = new UserRoleModel(this.instances, utils, this.localUtils, __settings.SIMPLE_API.DBS);
+    this.token = new TokenModel(this.instances, utils, this.localUtils, __settings.SIMPLE_API.DBS);
   }
 
   async connect() {

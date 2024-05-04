@@ -38,7 +38,7 @@ export class Module {
   ) {
     let [method, name] = handlerName.split("::") as [HTTPMethods, string];
 
-    if(!this.utils.Http.isValidHTTPMethod(method) || !Boolean(app[method])) {
+    if(!this.utils.http.isValidHTTPMethod(method) || !Boolean(app[method])) {
       console.log(`  Endpoint - ${name} - has invalid http method`);
       return;
     }

@@ -20,10 +20,10 @@ import { BookModule } from "./modules/book.module";
 
 // Run app
 (async function() {
-  const sv = new Services();
   const utils = new Utils();
   const dbs = new Databases(utils);
-  const middlewares = new Middlewares(utils);
+  const serv = new Services(dbs, utils);
+  const middlewares = new Middlewares(dbs, serv, utils);
 
   const serverSettings = {
     port: AppSettings.PORT
@@ -32,7 +32,7 @@ import { BookModule } from "./modules/book.module";
   const myServer = new MyServer(utils, serverSettings);
   const builder = new ServerBuilder(myServer);
 
-  const book = new BookModule(dbs, sv, utils, middlewares);
+  const book = new BookModule(dbs, serv, utils, middlewares);
 
   // Build databases
   await builder.buildDatabases(dbs);

@@ -14,21 +14,21 @@ export class Controller {
   static ReservedMethods = ["constructor", "buildWithMiddlewares"];
 
   protected dbs!: Databases;
-  protected sv!: Services;
+  protected serv!: Services;
   protected utils!: Utils;
   protected midws!: Middlewares;
   withMiddlewares!: Map<string, Array<MiddlewareFunction | HandlerFunction>>;
 
-  constructor(dbs: Databases, sv: Services, utils: Utils, midws: Middlewares) {
+  constructor(dbs: Databases, serv: Services, utils: Utils, midws: Middlewares) {
     this.dbs = dbs;
-    this.sv = sv;
+    this.serv = serv;
     this.utils = utils;
     this.midws = midws;
     this.withMiddlewares = new Map();
 
     // Bind all methods
     // Methods will be removed after server is built completely.
-    this.utils.Object.bindClassInstance(this, { reservedMethods: Controller.ReservedMethods });
+    this.utils.object.bindClassInstance(this, { reservedMethods: Controller.ReservedMethods });
   }
 
   buildWithMiddlewares(name: string, ...middlewares: Array<MiddlewareFunction | HandlerFunction>) {

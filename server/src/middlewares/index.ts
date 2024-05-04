@@ -1,12 +1,14 @@
-import { AuthorizeMiddleware } from "./authorize";
+import { AuthorizationMiddleware } from "./authorization";
 
 // Import types
 import type { Utils } from "src/utils";
+import type { Databases } from "src/databases";
+import type { Services } from "src/services";
 
 export class Middlewares {
-  Authorize!: AuthorizeMiddleware;
+  authorization!: AuthorizationMiddleware;
   
-  constructor(utils: Utils) {
-    this.Authorize = new AuthorizeMiddleware(utils);
+  constructor(dbs: Databases, serv: Services, utils: Utils) {
+    this.authorization = new AuthorizationMiddleware(dbs, serv, utils);
   }
 }

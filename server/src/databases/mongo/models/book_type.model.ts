@@ -40,7 +40,7 @@ export class BookTypeModel extends Model<Mongo_BookTypeModelData> implements IMo
     this.db = mongos.SIMPLE_API.db(this.__dbInfo.BOOK.NAME);
   }
 
-  getCollection() {
+  private __getCollection() {
     return this.__localUtils.getCollection<Mongo_BookTypeModelData>(this.db, this.__dbInfo.BOOK.OBJECTS.TYPE);
   }
 
@@ -48,7 +48,7 @@ export class BookTypeModel extends Model<Mongo_BookTypeModelData> implements IMo
     let code = 1;
     let message: string = "";
     let data: Mongo_BookTypeModelData | null = [] as any;
-    const __collection = this.getCollection();
+    const __collection = this.__getCollection();
 
     try {
       const pipeline = [];
@@ -81,7 +81,7 @@ export class BookTypeModel extends Model<Mongo_BookTypeModelData> implements IMo
       message = error.message;
       data = null;
     } finally {
-      return this.utils.Http.generateInterchange(code, message, data);
+      return this.utils.http.generateInterchange(code, message, data);
     }
   }
 
@@ -89,7 +89,7 @@ export class BookTypeModel extends Model<Mongo_BookTypeModelData> implements IMo
     let code = 1;
     let message: string = "";
     let data: Array<Mongo_BookTypeModelData> | null = [] as any;
-    const __collection = this.getCollection();
+    const __collection = this.__getCollection();
     
     try {
       const pipeline = [];
@@ -133,7 +133,7 @@ export class BookTypeModel extends Model<Mongo_BookTypeModelData> implements IMo
       message = error.message;
       data = null;
     } finally {
-      return this.utils.Http.generateInterchange(code, message, data);
+      return this.utils.http.generateInterchange(code, message, data);
     }
   }
 }

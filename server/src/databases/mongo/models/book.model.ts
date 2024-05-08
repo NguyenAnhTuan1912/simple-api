@@ -16,7 +16,6 @@ import type {
   Mongo_BooksQuery,
   Mongo_BookParams
 } from "../index.types";
-import type { Utils } from "src/utils";
 import type { MongoUtils } from "../utils";
 import type { Mongo_Instances, Mongo_DBInformations } from "..";
 
@@ -27,11 +26,10 @@ export class BookModel extends Model<Mongo_BookModelData> implements IModel<Mong
 
   constructor(
     mongos: Mongo_Instances,
-    utils: Utils,
     localUtils: MongoUtils,
     dbInformations: Mongo_DBInformations
   ) {
-    super(utils);
+    super();
     this.schema = Joi.object<Mongo_BookModelData>({
       typeIds: Joi.array().items(Joi.string()).default([]),
       authorId: Joi.string().required(),
@@ -49,12 +47,9 @@ export class BookModel extends Model<Mongo_BookModelData> implements IModel<Mong
   }
 
   async query(...args: [Mongo_BookQuery?, Mongo_BookParams?]) {
-    let code = 1;
-    let message: string = "";
-    let data: Mongo_BookResponseData | null = [] as any;
     const __collection = this.__getCollection();
-    
-    try {
+
+    return await this.handleErrorWithInterchangeAsResult<Mongo_BookResponseData, this>(this, async function(o) {
       const pipeline = [];
 
       // If request has params
@@ -87,24 +82,17 @@ export class BookModel extends Model<Mongo_BookModelData> implements IModel<Mong
 
       if(!result) throw new Error(`The book with ${args[1].id} id isn't found`);
 
-      data = result[0] as Mongo_BookResponseData;
-      message = "Query book successfully";
-    } catch (error: any) {
-      code = 0;
-      message = error.message;
-      data = null;
-    } finally {
-      return this.utils.http.generateInterchange(code, message, data);
-    }
+      o.data = result[0] as Mongo_BookResponseData;
+      o.message = "Query book successfully";
+
+      return o;
+    });
   }
 
   async queryMultiply(...args: [Mongo_BooksQuery, Mongo_BookParams?]) {
-    let code = 1;
-    let message: string = "";
-    let data: Array<Mongo_BookResponseData> | null = [] as any;
     const __collection = this.__getCollection();
     
-    try {
+    return await this.handleErrorWithInterchangeAsResult<Mongo_BookResponseData[], this>(this, async function(o) {
       const pipeline = [];
 
       // If request has queries
@@ -150,14 +138,10 @@ export class BookModel extends Model<Mongo_BookModelData> implements IModel<Mong
       );
 
       const cursor = __collection.aggregate<Mongo_BookResponseData>(pipeline);
-      data = await cursor.toArray();
-      message = "Query books successfully";
-    } catch (error: any) {
-      code = 0;
-      message = error.message;
-      data = null;
-    } finally {
-      return this.utils.http.generateInterchange(code, message, data);
-    }
+      o.data = await cursor.toArray();
+      o.message = "Query books successfully";
+
+      return o;
+    });
   }
 }

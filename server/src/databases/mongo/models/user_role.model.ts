@@ -24,11 +24,10 @@ export class UserRoleModel extends Model<Mongo_UserRoleModelData> implements IMo
 
   constructor(
     mongos: Mongo_Instances,
-    utils: Utils,
     localUtils: MongoUtils,
     dbInformations: Mongo_DBInformations
   ) {
-    super(utils);
+    super();
     this.schema = Joi.object<Mongo_UserRoleModelData>({
       name: Joi.string().required(),
       rights: Joi.string().required()
@@ -43,25 +42,18 @@ export class UserRoleModel extends Model<Mongo_UserRoleModelData> implements IMo
   }
 
   async query(...args: [string]) {
-    let code = 1;
-    let message: string = "";
-    let data: Mongo_UserRoleModelData | null = [] as any;
     const __collection = this.__getCollection();
 
-    try {
+    return await this.handleErrorWithInterchangeAsResult<Mongo_UserRoleModelData, this>(this, async function(o) {
       const role = args[0];
       const result = await __collection.findOne({ name: role });
 
       if(!result) throw new Error(`The role name ${role} isn't found`);
 
-      data = result as Mongo_UserRoleModelData;
-      message = "Query genre of book successfully";
-    } catch (error: any) {
-      code = 0;
-      message = error.message;
-      data = null;
-    } finally {
-      return this.utils.http.generateInterchange(code, message, data);
-    }
+      o.data = result as Mongo_UserRoleModelData;
+      o.message = "Query genre of book successfully";
+
+      return o;
+    });
   }
 }

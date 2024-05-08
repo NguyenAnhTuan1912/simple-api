@@ -18,9 +18,8 @@ export class MyServer {
   private __instance!: Server;
   private __settings!: MyServerSettings;
   
-  constructor(utils: Utils, settings: MyServerSettings) {
+  constructor(settings: MyServerSettings) {
     this.app = express();
-    this.utils = utils;
     this.__instance = http.createServer(this.app);
     this.__settings = settings;
   }

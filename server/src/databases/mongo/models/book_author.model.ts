@@ -15,7 +15,6 @@ import type {
   Mongo_BookAuthorsQuery,
   Mongo_BookAuthorParams
 } from "../index.types";
-import type { Utils } from "src/utils";
 import type { MongoUtils } from "../utils";
 import type { Mongo_Instances, Mongo_DBInformations } from "..";
 
@@ -26,11 +25,10 @@ export class BookAuthorModel extends Model<Mongo_BookAuthorModelData> implements
 
   constructor(
     mongos: Mongo_Instances,
-    utils: Utils,
     localUtils: MongoUtils,
     dbInformations: Mongo_DBInformations
   ) {
-    super(utils);
+    super();
     this.schema = Joi.object<Mongo_BookAuthorModelData>({
       name: Joi.string().default(""),
       desc: Joi.string().default(""),
@@ -47,12 +45,9 @@ export class BookAuthorModel extends Model<Mongo_BookAuthorModelData> implements
   }
 
   async query(...args: [Mongo_BookAuthorQuery?, Mongo_BookAuthorParams?]) {
-    let code = 1;
-    let message: string = "";
-    let data: Mongo_BookAuthorModelData | null = [] as any;
     const __collection = this.__getCollection();
 
-    try {
+    return await this.handleErrorWithInterchangeAsResult<Mongo_BookAuthorModelData, this>(this, async function(o) {
       const pipeline = [];
 
       // If request has params
@@ -76,24 +71,16 @@ export class BookAuthorModel extends Model<Mongo_BookAuthorModelData> implements
 
       if(!result) throw new Error(`The author with ${args[1].id} id isn't found`);
 
-      data = result[0] as Mongo_BookAuthorModelData;
-      message = "Query author successfully";
-    } catch (error: any) {
-      code = 0;
-      message = error.message;
-      data = null;
-    } finally {
-      return this.utils.http.generateInterchange(code, message, data);
-    }
+      o.data = result[0] as Mongo_BookAuthorModelData;
+
+      return o;
+    });
   }
 
   async queryMultiply(...args: [Mongo_BookAuthorsQuery, Mongo_BookAuthorParams?]) {
-    let code = 1;
-    let message: string = "";
-    let data: Array<Mongo_BookAuthorModelData> | null = [] as any;
     const __collection = this.__getCollection();
-    
-    try {
+
+    return await this.handleErrorWithInterchangeAsResult<Mongo_BookAuthorModelData[], this>(this, async function(o) {
       const pipeline = [];
 
       // If request has queries
@@ -120,14 +107,10 @@ export class BookAuthorModel extends Model<Mongo_BookAuthorModelData> implements
       );
 
       const cursor = __collection.aggregate<Mongo_BookAuthorModelData>(pipeline);
-      data = await cursor.toArray();
-      message = "Query authors successfully";
-    } catch (error: any) {
-      code = 0;
-      message = error.message;
-      data = null;
-    } finally {
-      return this.utils.http.generateInterchange(code, message, data);
-    }
+      o.data = await cursor.toArray() as Mongo_BookAuthorModelData[];
+      o.message = "Query authors successfully";
+
+      return o;
+    });
   }
 }

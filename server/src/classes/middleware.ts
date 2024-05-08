@@ -1,15 +1,15 @@
+import { Base } from "./Base";
+
 // Import types
-import type { Utils } from "src/utils";
 import type { Databases } from "src/databases";
 import type { Services } from "src/services";
 
-export class Middleware {
-  utils!: Utils;
+export class Middleware extends Base {
   dbs!: Databases;
   serv!: Services;
 
-  constructor(dbs: Databases, serv: Services, utils: Utils) {
-    this.utils = utils;
+  constructor(dbs: Databases, serv: Services) {
+    super();
     this.dbs = dbs;
     this.serv = serv;
 

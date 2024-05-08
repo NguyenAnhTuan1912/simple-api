@@ -7,8 +7,33 @@ import { AuthSettings } from "src/auth.settings";
 import type { Request, Response, NextFunction } from "express";
 
 export class AuthorizationMiddleware extends Middleware {
-  constructor(dbs: any, serv: any, utils: any) {
-    super(dbs, serv, utils);
+  constructor(dbs: any, serv: any) {
+    super(dbs, serv);
+  }
+
+  /**
+   * Use this method to verify `guest` or more-rights roles in app. Token doesn't require on Guests, 
+   * but they have `limitations`
+   * @param req 
+   * @param res 
+   * @param next 
+   * @returns 
+   */
+  async guest(req: Request, res: Response, next: NextFunction) {
+    let code = 200;
+    let message = null;
+
+    try {
+      const bearerToken = req.headers.authorization;
+      const verifiedToken = await this.serv.auth.verifyToken(bearerToken);
+
+      let role = verifiedToken.code ? verifiedToken.data!.role : AuthSettings.ROLES.GUEST;
+
+      return next();
+    } catch (error: any) {
+      message = error.message;
+      return res.status(code).json(this.utils.http.generateHTTPResponse(code, null, message));
+    }
   }
 
   async user(req: Request, res: Response, next: NextFunction) {
@@ -16,23 +41,14 @@ export class AuthorizationMiddleware extends Middleware {
     let message = null;
 
     try {
-      const bearerToken  = req.headers.authorization;
-      if(!bearerToken) throw new Error("Toke is required");
-
-      const [, token] = bearerToken?.split(" ");
-      const tokenModelDataResult = await this.dbs.mongo.token.query(token);
-      if(!tokenModelDataResult.code || !tokenModelDataResult.data) {
+      const bearerToken = req.headers.authorization;
+      const verifiedToken = await this.serv.auth.verifyToken(bearerToken);
+      if(!verifiedToken.code) {
         code = 401;
-        throw new Error("Token doesn't exist. It probably isn't created");
+        throw new Error(verifiedToken.message!);
       }
 
-      let verificationResult = this.serv.auth.verifyToken(tokenModelDataResult.data);
-      if(!verificationResult.code) {
-        code = 401;
-        throw new Error(verificationResult.message!);
-      }
-
-      let role = verificationResult.data!.role;
+      let role = verifiedToken.data!.role;
       if(!this.serv.auth.checkUser(role)) {
         code = 403;
         throw new Error(`${role} doesn't have any permission to do this action`);
@@ -44,7 +60,10 @@ export class AuthorizationMiddleware extends Middleware {
         throw new Error(roleModelData.message!);
       }
 
-      const rights = roleModelData.data?.rights;
+      const { name, rights } = roleModelData.data!;
+      const permissions = this.serv.auth.generatePermission(name, rights);
+
+      (req as any).permissions = permissions;
 
       return next();
     } catch (error: any) {

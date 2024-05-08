@@ -1,6 +1,8 @@
 /**
  * Classes in this file are used for inheritance.
  */
+import { Base } from "./Base";
+
 import type { Request, Response, NextFunction } from "express";
 import type { Databases } from "src/databases";
 import type { Services } from "src/services";
@@ -10,19 +12,18 @@ import type { Middlewares } from "src/middlewares";
 export type HandlerFunction = (req: Request, res: Response, next?: NextFunction) => any;
 export type MiddlewareFunction = (req: Request, res: Response, next: NextFunction) => any;
 
-export class Controller {
+export class Controller extends Base {
   static ReservedMethods = ["constructor", "buildWithMiddlewares"];
 
   protected dbs!: Databases;
   protected serv!: Services;
-  protected utils!: Utils;
   protected midws!: Middlewares;
   withMiddlewares!: Map<string, Array<MiddlewareFunction | HandlerFunction>>;
 
-  constructor(dbs: Databases, serv: Services, utils: Utils, midws: Middlewares) {
+  constructor(dbs: Databases, serv: Services, midws: Middlewares) {
+    super();
     this.dbs = dbs;
     this.serv = serv;
-    this.utils = utils;
     this.midws = midws;
     this.withMiddlewares = new Map();
 

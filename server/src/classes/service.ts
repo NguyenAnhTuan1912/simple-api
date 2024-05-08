@@ -1,18 +1,17 @@
 /**
  * Classes in this file are used for inheritance.
  */
+import { Base } from "./Base";
 
 // Import types
 import type { Databases } from "src/databases";
-import type { Utils } from "src/utils";
 
-export class Service {
+export class Service extends Base {
   protected dbs!: Databases;
-  protected utils!: Utils;
 
-  constructor(dbs: Databases, utils: Utils) {
+  constructor(dbs: Databases) {
+    super();
     this.dbs = dbs;
-    this.utils = utils;
   }
 
   get [Symbol.toStringTag]() {

@@ -15,7 +15,6 @@ import type {
   Mongo_BookTypesQuery,
   Mongo_BookTypeParams
 } from "../index.types";
-import type { Utils } from "src/utils";
 import type { MongoUtils } from "../utils";
 import type { Mongo_Instances, Mongo_DBInformations } from "..";
 
@@ -26,11 +25,10 @@ export class BookTypeModel extends Model<Mongo_BookTypeModelData> implements IMo
 
   constructor(
     mongos: Mongo_Instances,
-    utils: Utils,
     localUtils: MongoUtils,
     dbInformations: Mongo_DBInformations
   ) {
-    super(utils);
+    super();
     this.schema = Joi.object<Mongo_BookTypeModelData>({
       name: Joi.string().required(),
       value: Joi.string().required()
@@ -45,12 +43,9 @@ export class BookTypeModel extends Model<Mongo_BookTypeModelData> implements IMo
   }
 
   async query(...args: [Mongo_BookTypeQuery?, Mongo_BookTypeParams?]) {
-    let code = 1;
-    let message: string = "";
-    let data: Mongo_BookTypeModelData | null = [] as any;
     const __collection = this.__getCollection();
 
-    try {
+    return await this.handleErrorWithInterchangeAsResult<Mongo_BookTypeModelData, this>(this, async function(o) {
       const pipeline = [];
 
       // If request has params
@@ -74,24 +69,17 @@ export class BookTypeModel extends Model<Mongo_BookTypeModelData> implements IMo
 
       if(!result) throw new Error(`The genre of book with ${args[1].id} id isn't found`);
 
-      data = result[0] as Mongo_BookTypeModelData;
-      message = "Query genre of book successfully";
-    } catch (error: any) {
-      code = 0;
-      message = error.message;
-      data = null;
-    } finally {
-      return this.utils.http.generateInterchange(code, message, data);
-    }
+      o.data = result[0] as Mongo_BookTypeModelData;
+      o.message = "Query genre of book successfully";
+
+      return o;
+    });
   }
 
   async queryMultiply(...args: [Mongo_BookTypesQuery, Mongo_BookTypeParams?]) {
-    let code = 1;
-    let message: string = "";
-    let data: Array<Mongo_BookTypeModelData> | null = [] as any;
     const __collection = this.__getCollection();
-    
-    try {
+
+    return await this.handleErrorWithInterchangeAsResult<Mongo_BookTypeModelData[], this>(this, async function(o) {
       const pipeline = [];
 
       // If request has queries
@@ -126,14 +114,10 @@ export class BookTypeModel extends Model<Mongo_BookTypeModelData> implements IMo
       );
 
       const cursor = __collection.aggregate<Mongo_BookTypeModelData>(pipeline);
-      data = await cursor.toArray();
-      message = "Query genre of books successfully";
-    } catch (error: any) {
-      code = 0;
-      message = error.message;
-      data = null;
-    } finally {
-      return this.utils.http.generateInterchange(code, message, data);
-    }
+      o.data = await cursor.toArray();
+      o.message = "Query genre of books successfully";
+      
+      return o;
+    });
   }
 }

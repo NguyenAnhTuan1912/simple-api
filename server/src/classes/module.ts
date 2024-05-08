@@ -1,8 +1,7 @@
 /**
  * Classes in this file are used for inheritance.
  */
-
-import { Utils } from "src/utils";
+import { Base } from "./Base";
 
 // Import types
 import type { Express } from "express";
@@ -10,14 +9,13 @@ import type { Controller, MiddlewareFunction, HandlerFunction } from "./Controll
 import type { HTTPMethods } from "src/types/http.types";
 import type { Middlewares } from "src/middlewares";
 
-export class Module {
-  protected utils!: Utils;
+export class Module extends Base {
   protected base!: string;
   protected controllers!: {[key: string]: Controller};
   protected midws!: Middlewares;
 
-  constructor(base: string, utils: Utils, midws: Middlewares) {
-    this.utils = utils;
+  constructor(base: string, midws: Middlewares) {
+    super();
     this.base = base;
     this.midws = midws;
     this.controllers = {};

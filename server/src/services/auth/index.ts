@@ -5,13 +5,13 @@ import { Service } from "src/classes/Service";
 import { AuthSettings } from "src/auth.settings";
 
 // Import types
+import type { Permissions } from "src/types/auth.types";
 import type { Databases } from "src/databases";
-import type { Utils } from "src/utils";
 import type { Mongo_TokenModelData, Mongo_TokenContentData } from "src/databases/mongo/index.types";
 
 export class AuthService extends Service {
-  constructor(dbs: Databases, utils: Utils) {
-    super(dbs, utils);
+  constructor(dbs: Databases) {
+    super(dbs);
   }
 
   /**
@@ -28,21 +28,31 @@ export class AuthService extends Service {
 
   /**
    * 
-   * @param token 
+   * @param tokenInHeaders 
    * @returns 
    */
-  verifyToken(token: Mongo_TokenModelData) {
+  async verifyToken(tokenInHeaders?: string) {
     let code = 1;
     let data: Mongo_TokenContentData | null = null;
     let message = "";
-    const { value, expire } = token;
 
     try {
+      if(!tokenInHeaders) throw new Error("Toke is required");
+
+      const [, token] = tokenInHeaders?.split(" ");
+
+      const tokenModelDataResult = await this.dbs.mongo.token.query(token);
+      if(!tokenModelDataResult.code || !tokenModelDataResult.data) throw new Error("Token doesn't exist. It probably isn't created");
+
+      let expire = tokenModelDataResult.data.expire;
       let now = Date.now();
+
       if(expire >= now) throw new Error("The token is expired");
-      data = JSON.parse(this.utils.crypto.decrypt(value)) as Mongo_TokenContentData;
+      
+      data = JSON.parse(this.utils.crypto.decrypt(tokenModelDataResult.data.value)) as Mongo_TokenContentData;
       message = "Token is valid";
     } catch (error: any) {
+      code = 0;
       message = error.message;
     } finally {
       return this.utils.http.generateInterchange(code, message, data);
@@ -59,13 +69,42 @@ export class AuthService extends Service {
     return [this.utils.crypto.encrypt(JSON.stringify({ role, credential })), this.__createExpiration(expire)];
   }
 
+  checkPermission() {
+    
+  }
+
   /**
    * 
    * @param role 
-   * @param query 
+   * @param rights 
    * @returns 
    */
-  createLimitations<T>(role: string, query: T) {
+  generatePermission(role: string, rights: string) {
+    let code = 1;
+    let data: Permissions | null = null;
+    let message = "";
+
+    try {
+      if(!role && !rights) throw new Error("Role and rights are required");
+      data = {
+        resources: [],
+        actions: {}
+      }
+    } catch (error: any) {
+      code = 0;
+      message = error.message;
+    } finally {
+      return this.utils.http.generateInterchange(code, message, data);
+    }
+  }
+
+  /**
+   * 
+   * @param query 
+   * @param permissions 
+   * @returns 
+   */
+  generateLimitations<T>(query: T, permissions: Permissions) {
     let code = 1;
     let data: Mongo_TokenContentData | null = null;
     let message = "";
@@ -73,6 +112,7 @@ export class AuthService extends Service {
     try {
       
     } catch (error: any) {
+      code = 0;
       message = error.message;
     } finally {
       return this.utils.http.generateInterchange(code, message, data);

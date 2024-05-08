@@ -11,10 +11,10 @@ import type { Services } from "src/services";
 import type { Middlewares } from "src/middlewares";
 
 export class BookModule extends Module {
-  constructor(dbs: Databases, serv: Services, utils: Utils, midws: Middlewares) {
-    super("/books", utils, midws);
+  constructor(dbs: Databases, serv: Services, midws: Middlewares) {
+    super("/books", midws);
     this.controllers = {
-      book: new BookController(dbs, serv, utils, midws)
+      book: new BookController(dbs, serv, midws)
     };
   }
 }

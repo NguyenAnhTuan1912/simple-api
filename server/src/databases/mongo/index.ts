@@ -16,9 +16,6 @@ import { UserRoleModel } from "./models/user_role.model";
 // Import settings
 import { AppSettings } from "src/settings";
 
-// Import types
-import type { Utils } from "src/utils";
-
 const __settings = AppSettings.MONGO;
 
 export type Mongo_Instances = {
@@ -37,7 +34,7 @@ export class MongoDatabase extends Database<Mongo_Instances, MongoUtils> {
   userRole!: UserRoleModel;
   token!: TokenModel;
 
-  constructor(utils: Utils) {
+  constructor() {
     super(new MongoUtils());
 
     let cluserNames = Object.keys(__settings);
@@ -52,11 +49,11 @@ export class MongoDatabase extends Database<Mongo_Instances, MongoUtils> {
       )
     }
 
-    this.book = new BookModel(this.instances, utils, this.localUtils, __settings.SIMPLE_API.DBS);
-    this.bookAuthor = new BookAuthorModel(this.instances, utils, this.localUtils, __settings.SIMPLE_API.DBS);
-    this.bookType = new BookTypeModel(this.instances, utils, this.localUtils, __settings.SIMPLE_API.DBS);
-    this.userRole = new UserRoleModel(this.instances, utils, this.localUtils, __settings.SIMPLE_API.DBS);
-    this.token = new TokenModel(this.instances, utils, this.localUtils, __settings.SIMPLE_API.DBS);
+    this.book = new BookModel(this.instances, this.localUtils, __settings.SIMPLE_API.DBS);
+    this.bookAuthor = new BookAuthorModel(this.instances, this.localUtils, __settings.SIMPLE_API.DBS);
+    this.bookType = new BookTypeModel(this.instances, this.localUtils, __settings.SIMPLE_API.DBS);
+    this.userRole = new UserRoleModel(this.instances, this.localUtils, __settings.SIMPLE_API.DBS);
+    this.token = new TokenModel(this.instances, this.localUtils, __settings.SIMPLE_API.DBS);
   }
 
   async connect() {

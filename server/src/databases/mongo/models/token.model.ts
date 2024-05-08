@@ -23,11 +23,10 @@ export class TokenModel extends Model<Mongo_TokenModelData> implements IModel<Mo
 
   constructor(
     mongos: Mongo_Instances,
-    utils: Utils,
     localUtils: MongoUtils,
     dbInformations: Mongo_DBInformations
   ) {
-    super(utils);
+    super();
     this.schema = Joi.object<Mongo_TokenModelData>({
       value: Joi.string().required()
     });
@@ -41,12 +40,9 @@ export class TokenModel extends Model<Mongo_TokenModelData> implements IModel<Mo
   }
 
   async query(...args: [string]) {
-    let code = 1;
-    let message: string = "";
-    let data: Mongo_TokenModelData | null = [] as any;
     const __collection = this.__getCollection();
     
-    try {
+    return await this.handleErrorWithInterchangeAsResult<Mongo_TokenModelData, this>(this, async function(o) {
       const pipeline = [];
 
       // If request has params
@@ -56,38 +52,27 @@ export class TokenModel extends Model<Mongo_TokenModelData> implements IModel<Mo
 
       if(!result) throw new Error(`The token isn't found`);
 
-      data = result as Mongo_TokenModelData;
-      message = "Query token successfully";
-    } catch (error: any) {
-      code = 0;
-      message = error.message;
-      data = null;
-    } finally {
-      return this.utils.http.generateInterchange(code, message, data);
-    }
+      o.data = result as Mongo_TokenModelData;
+      o.message = "Query token successfully";
+      
+      return o;
+    });
   }
 
   async create(...args: [string, number]) {
-    let code = 1;
-    let message: string = "";
-    let data: Mongo_TokenModelData | null = null as any;
     const __collection = this.__getCollection();
     
-    try {
+    return await this.handleErrorWithInterchangeAsResult<Mongo_TokenModelData, this>(this, async function(o) {
       let tokenValue = args[0], expire = args[1];
       let token = { value: tokenValue, expire };
       let result = await __collection.insertOne(token);
 
       if(!result) throw new Error(`The token isn't created successfully`);
 
-      data = token as Mongo_TokenModelData;
-      message = "Create token successfully";
-    } catch (error: any) {
-      code = 0;
-      message = error.message;
-      data = null;
-    } finally {
-      return this.utils.http.generateInterchange(code, message, data);
-    }
+      o.data = token as Mongo_TokenModelData;
+      o.message = "Create token successfully";
+      
+      return o;
+    })
   }
 }

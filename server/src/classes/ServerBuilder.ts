@@ -1,5 +1,5 @@
 import type { MyServer } from "./MyServer";
-import type { Module } from "./module";
+import type { Module } from "./Module";
 import type { Databases } from "src/databases";
 
 export class ServerBuilder {

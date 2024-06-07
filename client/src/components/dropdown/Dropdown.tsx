@@ -20,9 +20,8 @@ export default function Dropdown<N>(props: DropdownProps<N>) {
       return (
         <li key={index}>
           <Button
-            buttonType="normal"
             colorType="background"
-            extendClassName="flex justify-between w-full px-3 py-2 rounded-lg hover:bg-primary/10"
+            extendClassName="flex justify-between w-full rounded-lg hover:bg-primary/10"
             hasFocusOutline={false}  
             onClick={() => props.onSelectItem(item)}
           >
@@ -34,10 +33,7 @@ export default function Dropdown<N>(props: DropdownProps<N>) {
   }, []);
 
   React.useEffect(function() {
-    if(props.selectedValue) {
-      stateFns.updateSelectedItem(props.topValue);
-      stateFns.setIsOpen(true);
-    }
+    stateFns.setIsOpen(true);
   }, []);
 
   return (
@@ -47,9 +43,15 @@ export default function Dropdown<N>(props: DropdownProps<N>) {
         extendClassName="flex justify-between w-full hover:bg-primary/10"
         hasFocusOutline={false} 
         onClick={function() {
-          stateFns.updateSelectedItem(props.topValue);
           stateFns.toggleIsOpen();
-          props.onSelectTop(props.topValue);
+          console.log("Hello: ", props.topValue);
+
+          if(props.topValue !== undefined)
+            stateFns.updateSelectedItem(props.topValue);
+          
+          if(props.topValue !== undefined && props.onSelectTop) {
+            props.onSelectTop(props.topValue);
+          }
         }}
       >
         <h1 className="font-bold uppercase text-lg">{props.title}</h1>

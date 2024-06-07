@@ -1,6 +1,9 @@
 // Import orther local utils
 import { PipelineUtil } from "./pipeline";
 
+// Import types
+import type { Db, Document } from "mongodb";
+
 export class MongoUtils {
   Pipeline!: PipelineUtil;
 
@@ -25,5 +28,15 @@ export class MongoUtils {
     }
 
     return `mongodb+srv://${username}:${password}@${domain}/?retryWrites=true&w=majority`;
+  }
+
+  /**
+   * Use this method to get instance of mongo collection
+   * @param db 
+   * @param collection 
+   * @returns 
+   */
+  getCollection<T extends Document>(db: Db, collection: string) {
+    return db.collection<T>(collection);
   }
 }

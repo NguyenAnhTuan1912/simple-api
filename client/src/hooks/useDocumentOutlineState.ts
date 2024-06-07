@@ -20,7 +20,7 @@ export const {
       /**
        * Use this dispatcher to get document outline
        */
-      getPlayerIDAsync() {
+      getDocumentOutlineAsync() {
         dispatch(getDocumentOutlineAsyncThunk());
       }
     }

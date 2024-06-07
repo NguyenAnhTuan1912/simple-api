@@ -42,7 +42,7 @@ export default function ThreeColumnLayout(props: ThreeColumnLayoutProps) {
           </div>
         )}
       />
-      <div className="flex w-full min-h-screen">
+      <div className="flex w-full">
         {/* Left side */}
         {
           typeof props.leftSide === "function"

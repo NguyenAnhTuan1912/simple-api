@@ -1,4 +1,4 @@
-import { Util } from "src/classes/util";
+import { Util } from "src/classes/Util";
 
 // Import types
 import type { HTTPStatus, HTTPResponse, HTTPMethods } from "src/types/http.types";

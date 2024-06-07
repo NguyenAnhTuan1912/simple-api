@@ -1,9 +1,15 @@
-import { ExampleService } from "./example/example.service";
+import { Base } from "src/classes/Base";
+
+// Import services
+import { AuthService } from "./auth";
+
+//Import types
+import type { Databases } from "src/databases";
 
 export class Services {
-  example!: ExampleService;
+  auth!: AuthService;
 
-  constructor() {
-    this.example = new ExampleService();
+  constructor(dbs: Databases) {
+    this.auth = new AuthService(dbs);
   }
 }

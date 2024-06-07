@@ -11,7 +11,7 @@ import SideLayout from 'src/layouts/SideLayout';
 import Dropdown from '../dropdown/Dropdown';
 
 // Import route names
-import { RouteNames } from 'src/routenames';
+import { RouteNames } from 'src/routes.config';
 
 // Import types
 import type { CustomizedModalItemProps } from 'tunangn-react-modal';
@@ -29,7 +29,7 @@ export default function ContentSide(props: CustomizedModalItemProps) {
   const navigate = useNavigate();
 
   React.useEffect(function() {
-    documentOutlineDispatcher.getPlayerIDAsync();
+    documentOutlineDispatcher.getDocumentOutlineAsync();
   }, []);
 
   return (

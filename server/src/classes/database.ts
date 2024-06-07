@@ -5,16 +5,21 @@
  *   - The project uses `joi` for model's schema. So each model must define a schema.
  */
 
+import { Base } from "./Base";
+
 // Import types
 import type { IDatabase } from "src/types/database.types";
 import type { Utils } from "src/utils";
 import type { ObjectSchema } from "joi";
 
-export class Database<Instances> implements IDatabase {
+export class Database<Instances, Utils> extends Base implements IDatabase {
   protected instances!: Instances;
+  protected localUtils!: Utils;
 
-  constructor() {
+  constructor(localUtil: Utils) {
+    super();
     this.instances = {} as any;
+    this.localUtils = localUtil;
   }
 
   async connect(): Promise<void> {};
@@ -23,12 +28,11 @@ export class Database<Instances> implements IDatabase {
   }
 }
 
-export class Model<T> {
+export class Model<T> extends Base {
   protected schema!: ObjectSchema<T>;
-  protected utils!: Utils;
 
-  constructor(utils: Utils) {
-    this.utils = utils;
+  constructor() {
+    super();
   }
 
   async validateDataAsync(data: T) {

@@ -1,4 +1,4 @@
-import { Util } from "src/classes/util";
+import { Util } from "src/classes/Util";
 
 type BindClassInstanceOptions = {
   reservedMethods: Array<string>;

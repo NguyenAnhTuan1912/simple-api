@@ -1,19 +1,27 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React from 'react';
+import { Link } from 'react-router-dom';
 import { GrGithub } from "react-icons/gr";
+import { IoSunny, IoMoon } from 'react-icons/io5';
+
+// Import objects
+import { Theme } from 'src/objects/Theme';
+
+// Import hooks
+import { useTheme } from 'src/hooks/useTheme';
 
 // Import components
 import Button from '../buttons/Button';
+import { openNavSideMenu } from '../sides/utils';
 
 // Import route names
-import { RouteNames } from 'src/routenames';
-
-import { openNavSideMenu } from '../sides/utils';
+import { RouteNames } from 'src/routes.config';
 
 // Import types
 import type { HeaderProps } from './Header.props';
 
 export default function Header(props: HeaderProps) {
+  const { theme, themeDispatchers } = useTheme();
+
   const NavItem_Elements = React.useMemo(() => {
     return Object.keys(RouteNames).map(function(key: string, index: number) {
       if(index === 0) return;
@@ -29,7 +37,7 @@ export default function Header(props: HeaderProps) {
   }, []);
 
   return (
-    <header className="border-b">
+    <header className="border-b sticky top-0 bg-background z-10">
       <div className="flex justify-between p-4 m-auto w-full">
         {
           !props.leftSide
@@ -48,16 +56,39 @@ export default function Header(props: HeaderProps) {
           !props.rightSide
             ? (
               <div className="flex items-center">
-                <nav className="border-r me-6 px-3 hidden sm:block">
+                <nav className="border-r px-3 hidden sm:block">
                   <ul className="flex flex-row">
                     {
                       NavItem_Elements
                     }
                   </ul>
                 </nav>
-                <a className="hidden sm:block" href="https://github.com/NguyenAnhTuan1912/simple-api" target="_blank">
-                  <GrGithub className="text-2xl cursor-pointer hover:bg-salte-50" />
-                </a>
+                <div className="flex px-3 justify-content">
+                  {
+                    theme.currentScheme === "light"
+                    ? (
+                      <Button
+                        buttonType="non_padding" colorType="background"
+                        onClick={() => themeDispatchers.changeScheme(Theme.Schemes.dark)}
+                        extendClassName="select-none"
+                      >
+                        <IoMoon className="text-2xl text-on-primary" />
+                      </Button>
+                    )
+                    : (
+                      <Button
+                        buttonType="non_padding" colorType="background"
+                        onClick={() => themeDispatchers.changeScheme(Theme.Schemes.light)}
+                        extendClassName="select-none"
+                      >
+                        <IoSunny className="text-2xl text-on-primary" />
+                      </Button>
+                    )
+                  }
+                  <a className="hidden ms-3 sm:block" href="https://github.com/NguyenAnhTuan1912/simple-api" target="_blank">
+                    <GrGithub className="text-2xl cursor-pointer hover:bg-salte-50" />
+                  </a>
+                </div>
                 <Button
                   colorType="onPrimary"
                   buttonType="normal"

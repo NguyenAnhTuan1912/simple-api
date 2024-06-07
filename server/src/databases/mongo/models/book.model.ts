@@ -1,31 +1,35 @@
 import Joi, { ObjectSchema } from "joi";
 
 // Import classes
-import { Model } from "src/classes/database";
+import { Model } from "src/classes/Database";
 
 // Import mongodb settings
 import { AppSettings } from "src/settings";
 
 // Import types
-import { type Db, type Document, type AggregationCursor, ObjectId } from "mongodb";
+import type { Db } from "mongodb";
 import type { IModel } from "src/types/database.types";
-import type { Mongo_BookModelData, Mongo_BookQuery, Mongo_BookParams } from "../index.types";
-import type { Utils } from "src/utils";
+import type {
+  Mongo_BookResponseData,
+  Mongo_BookModelData,
+  Mongo_BookQuery,
+  Mongo_BooksQuery,
+  Mongo_BookParams
+} from "../index.types";
 import type { MongoUtils } from "../utils";
 import type { Mongo_Instances, Mongo_DBInformations } from "..";
 
-export class BookModel extends Model<Mongo_BookModelData> implements IModel<Mongo_BookModelData> {
+export class BookModel extends Model<Mongo_BookModelData> implements IModel<Mongo_BookResponseData> {
   protected db!: Db;
   private __dbInfo!: Mongo_DBInformations;
   private __localUtils!: MongoUtils;
 
   constructor(
     mongos: Mongo_Instances,
-    utils: Utils,
     localUtils: MongoUtils,
     dbInformations: Mongo_DBInformations
   ) {
-    super(utils);
+    super();
     this.schema = Joi.object<Mongo_BookModelData>({
       typeIds: Joi.array().items(Joi.string()).default([]),
       authorId: Joi.string().required(),
@@ -38,13 +42,14 @@ export class BookModel extends Model<Mongo_BookModelData> implements IModel<Mong
     this.db = mongos.SIMPLE_API.db(this.__dbInfo.BOOK.NAME);
   }
 
+  private __getCollection() {
+    return this.__localUtils.getCollection<Mongo_BookModelData>(this.db, this.__dbInfo.BOOK.OBJECTS.BOOK);
+  }
+
   async query(...args: [Mongo_BookQuery?, Mongo_BookParams?]) {
-    let code = 1;
-    let message: string = "";
-    let data: Mongo_BookModelData | null = [] as any;
-    const __collection = this.db.collection<Mongo_BookModelData>(this.__dbInfo.BOOK.OBJECTS.BOOK);
-    
-    try {
+    const __collection = this.__getCollection();
+
+    return await this.handleErrorWithInterchangeAsResult<Mongo_BookResponseData, this>(this, async function(o) {
       const pipeline = [];
 
       // If request has params
@@ -77,24 +82,17 @@ export class BookModel extends Model<Mongo_BookModelData> implements IModel<Mong
 
       if(!result) throw new Error(`The book with ${args[1].id} id isn't found`);
 
-      data = result[0] as Mongo_BookModelData;
-      message = "Query book successfully";
-    } catch (error: any) {
-      code = 0;
-      message = error.message;
-      data = null;
-    } finally {
-      return this.utils.Http.generateInterchange(code, message, data);
-    }
+      o.data = result[0] as Mongo_BookResponseData;
+      o.message = "Query book successfully";
+
+      return o;
+    });
   }
 
-  async queryMultiply(...args: [Mongo_BookQuery, Mongo_BookParams?]) {
-    let code = 1;
-    let message: string = "";
-    let data: Array<Mongo_BookModelData> | null = [] as any;
-    const __collection = this.db.collection<Mongo_BookModelData>(this.__dbInfo.BOOK.OBJECTS.BOOK);
+  async queryMultiply(...args: [Mongo_BooksQuery, Mongo_BookParams?]) {
+    const __collection = this.__getCollection();
     
-    try {
+    return await this.handleErrorWithInterchangeAsResult<Mongo_BookResponseData[], this>(this, async function(o) {
       const pipeline = [];
 
       // If request has queries
@@ -114,6 +112,9 @@ export class BookModel extends Model<Mongo_BookModelData> implements IModel<Mong
               "types", this.__localUtils.Pipeline.getMatchArrayQuery("value", args[0].types)
             )
           );
+
+        // If match stage is empty
+        if(matchStage.$match.$and.length === 0) matchStage.$match = {} as any;
 
         pipeline.push(
           // Look-up Stage
@@ -136,15 +137,11 @@ export class BookModel extends Model<Mongo_BookModelData> implements IModel<Mong
         ...this.__localUtils.Pipeline.getLimitnSkipStage(parseInt(args[0].limit || "10"), parseInt(args[0].skip || "0"))
       );
 
-      const cursor = __collection.aggregate<Mongo_BookModelData>(pipeline);
-      data = await cursor.toArray();
-      message = "Query books successfully";
-    } catch (error: any) {
-      code = 0;
-      message = error.message;
-      data = null;
-    } finally {
-      return this.utils.Http.generateInterchange(code, message, data);
-    }
+      const cursor = __collection.aggregate<Mongo_BookResponseData>(pipeline);
+      o.data = await cursor.toArray();
+      o.message = "Query books successfully";
+
+      return o;
+    });
   }
 }

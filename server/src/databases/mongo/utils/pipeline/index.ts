@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
 
 // Import classes
-import { Util } from "src/classes/util";
+import { Util } from "src/classes/Util";
 
 export class PipelineUtil extends Util {
   /**

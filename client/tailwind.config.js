@@ -12,5 +12,5 @@ export default {
       colors: Theme.getTailwindColorsTheme()
     },
   },
-  plugins: [],
+  plugins: []
 }

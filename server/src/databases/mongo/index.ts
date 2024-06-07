@@ -4,16 +4,17 @@ import { MongoClient } from "mongodb";
 import { MongoUtils } from "./utils";
 
 // Import classes
-import { Database } from "../../classes/database";
+import { Database } from "../../classes/Database";
 
 // Import models
 import { BookModel } from "./models/book.model";
+import { BookAuthorModel } from "./models/book_author.model";
+import { BookTypeModel } from "./models/book_type.model";
+import { TokenModel } from "./models/token.model";
+import { UserRoleModel } from "./models/user_role.model";
 
 // Import settings
 import { AppSettings } from "src/settings";
-
-// Import types
-import type { Utils } from "src/utils";
 
 const __settings = AppSettings.MONGO;
 
@@ -25,13 +26,16 @@ export type Mongo_DBInformations = {
   [K in keyof typeof __settings.SIMPLE_API.DBS]: typeof __settings.SIMPLE_API.DBS[K];
 }
 
-export class MongoDatabase extends Database<Mongo_Instances> {
+export class MongoDatabase extends Database<Mongo_Instances, MongoUtils> {
   book!: BookModel;
-  localUtils!: MongoUtils;
+  bookAuthor!: BookAuthorModel;
+  bookType!: BookTypeModel;
 
-  constructor(utils: Utils) {
-    super();
-    this.localUtils = new MongoUtils();
+  userRole!: UserRoleModel;
+  token!: TokenModel;
+
+  constructor() {
+    super(new MongoUtils());
 
     let cluserNames = Object.keys(__settings);
 
@@ -45,7 +49,11 @@ export class MongoDatabase extends Database<Mongo_Instances> {
       )
     }
 
-    this.book = new BookModel(this.instances, utils, this.localUtils, __settings.SIMPLE_API.DBS);
+    this.book = new BookModel(this.instances, this.localUtils, __settings.SIMPLE_API.DBS);
+    this.bookAuthor = new BookAuthorModel(this.instances, this.localUtils, __settings.SIMPLE_API.DBS);
+    this.bookType = new BookTypeModel(this.instances, this.localUtils, __settings.SIMPLE_API.DBS);
+    this.userRole = new UserRoleModel(this.instances, this.localUtils, __settings.SIMPLE_API.DBS);
+    this.token = new TokenModel(this.instances, this.localUtils, __settings.SIMPLE_API.DBS);
   }
 
   async connect() {

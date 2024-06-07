@@ -12,3 +12,8 @@ export const RouteNames = {
     Name: "Test API"
   }
 }
+
+export const Actions = {
+  edit: "edit",
+  add: "add"
+}

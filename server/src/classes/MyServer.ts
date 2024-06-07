@@ -18,9 +18,8 @@ export class MyServer {
   private __instance!: Server;
   private __settings!: MyServerSettings;
   
-  constructor(utils: Utils, settings: MyServerSettings) {
+  constructor(settings: MyServerSettings) {
     this.app = express();
-    this.utils = utils;
     this.__instance = http.createServer(this.app);
     this.__settings = settings;
   }
@@ -33,7 +32,7 @@ export class MyServer {
     // Setup handshake endpoint
     let that = this;
     this.app.get("/", function(req, res) {
-      return res.status(200).json(that.utils.Http.generateHTTPResponse(200, "Hello from exmaple api", "Handshake Successful"));
+      return res.status(200).json(that.utils.http.generateHTTPResponse(200, "Hello from exmaple api", "Handshake Successful"));
     });
 
     this.__instance.listen(this.__settings.port, () => fn(this.__settings.port));

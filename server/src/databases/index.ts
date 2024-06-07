@@ -1,13 +1,16 @@
+import { Base } from "src/classes/Base";
+
 import { MongoDatabase } from "./mongo";
 
 // Import types
 import type { Utils } from "src/utils";
 
-export class Databases {
+export class Databases extends Base {
   mongo!: MongoDatabase;
 
-  constructor(utils: Utils) {
-    this.mongo = new MongoDatabase(utils);
+  constructor() {
+    super();
+    this.mongo = new MongoDatabase();
   }
 
   async connect() {

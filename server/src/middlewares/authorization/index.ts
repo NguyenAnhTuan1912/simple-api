@@ -27,7 +27,19 @@ export class AuthorizationMiddleware extends Middleware {
       const bearerToken = req.headers.authorization;
       const verifiedToken = await this.serv.auth.verifyToken(bearerToken);
 
-      let role = verifiedToken.code ? verifiedToken.data!.role : AuthSettings.ROLES.GUEST;
+      const role = verifiedToken.code ? verifiedToken.data!.role : AuthSettings.ROLES.GUEST;
+
+      const roleModelData = await this.dbs.mongo.userRole.query(role);
+      if(!roleModelData.code) {
+        code = 403;
+        throw new Error(roleModelData.message!);
+      }
+
+      const { name, rights } = roleModelData.data!;
+      const permissions = this.serv.auth.generatePermission(name, rights);
+      const limitations = this.serv.auth.generateLimitations(req.query, permissions.data!);
+
+      (req as any).limitations = limitations;
 
       return next();
     } catch (error: any) {

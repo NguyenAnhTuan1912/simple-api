@@ -7,10 +7,11 @@ import type { ButtonProps, Button_Types, Button_ColorTypes } from './Button.prop
 const __BorderRadiusTypes: {[key in Button_Types]: string} = {
   normal: "",
   rounded: "px-4 py-3 rounded-lg",
-  full_rounded: "p-4 rounded-[100%]"
+  full_rounded: "p-4 rounded-[100%]",
+  non_padding: "rounded-lg"
 }
 
-const __Colors: {[N in keyof Button_ColorTypes]: { bg: string, text: string }} = {
+const __Colors: Partial<{[N in Button_ColorTypes]: { bg: string, text: string }}> = {
   "primary": {
     bg: "bg-primary focus:non-outline",
     text: "text-on-primary"
@@ -29,11 +30,27 @@ const __Colors: {[N in keyof Button_ColorTypes]: { bg: string, text: string }} =
   },
   "background": {
     bg: "bg-background focus:non-outline",
-    text: "text-background"
+    text: "text-on-background"
   },
   "onBackground": {
     bg: "bg-on-background focus:non-outline",
-    text: "text-on-background"
+    text: "text-background"
+  },
+  "success": {
+    bg: "bg-success focus:non-outline",
+    text: "text-on-success"
+  },
+  "error": {
+    bg: "bg-error focus:non-outline",
+    text: "text-on-error"
+  },
+  "warning": {
+    bg: "bg-warning focus:non-outline",
+    text: "text-on-warning"
+  },
+  "info": {
+    bg: "bg-info focus:non-outline",
+    text: "text-on-info"
   }
 }
 
@@ -42,9 +59,12 @@ function appendBorderRadius(className: string, type: Button_Types | undefined) {
   return className + " " + __BorderRadiusTypes[type];
 }
 
-function appendColor(className: string, type: Button_ColorTypes) {
+function appendColor(className: string, type: Button_ColorTypes, isDisable?: boolean) {
+  if(typeof isDisable !== "undefined" && isDisable)
+    return className + " bg-outline/50 focus:non-outline text-outline/30";
+
   if(!type) return className;
-  return className + " " + __Colors[type].bg + " " + __Colors[type].text;
+  return className + " " + __Colors[type]!.bg + " " + __Colors[type]!.text;
 }
 
 export default function Button({
@@ -55,7 +75,7 @@ export default function Button({
   ...props
 }: ButtonProps) {
   let className = appendBorderRadius("", buttonType);
-  className = appendColor(className, colorType);
+  className = appendColor(className, colorType, props.disabled);
 
   if(hasFocusOutline) className += " " + "focus:ring focus:ring-outline";
 

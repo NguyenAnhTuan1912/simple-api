@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import SideLayout from 'src/layouts/SideLayout';
 
 // Import route names
-import { RouteNames } from 'src/routenames';
+import { RouteNames } from 'src/routes.config';
 
 // Import types
 import type { CustomizedModalItemProps } from 'tunangn-react-modal';

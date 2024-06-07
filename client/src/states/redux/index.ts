@@ -2,9 +2,12 @@ import { configureStore, combineReducers } from "@reduxjs/toolkit";
 
 // Import slices
 import { DocumentOutlineSlice } from "./document_outline";
+import { ThemeSlice } from "./theme";
+
 // Central Reducer.
 const reducers = combineReducers({
-  [DocumentOutlineSlice.name]: DocumentOutlineSlice.reducer
+  [DocumentOutlineSlice.name]: DocumentOutlineSlice.reducer,
+  [ThemeSlice.name]: ThemeSlice.reducer
 });
 
 /**

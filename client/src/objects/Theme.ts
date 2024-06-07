@@ -34,14 +34,14 @@ export const __ThemePropertyNames = {
   onBackground: "on-background",
   // subBackground: string,
   // onSubBackground: string,
-  // success?: string,
-  // onSuccess?: string,
-  // error?: string,
-  // onError?: string,
-  // waring?: string,
-  // onWarning?: string,
-  // info?: string,
-  // onInfo?: string
+  success: "success",
+  onSuccess: "on-success",
+  error: "error",
+  onError: "on-error",
+  warning: "warning",
+  onWarning: "on-waring",
+  info: "info",
+  onInfo: "on-info"
 }
 
 /**
@@ -56,11 +56,19 @@ export class Theme {
   static currentTheme: string = "";
   static initializedThemePropertyVariablesContent: string = ":root { }";
   static isThemePropertyVariablesInitialized: boolean = false;
+  static Schemes: {[S in typeof __AllowedThemeSchemes[number]]: typeof __AllowedThemeSchemes[number]} = {
+    light: "light",
+    dark: "dark"
+  }
 
   constructor(name: string) {
     this.name = name;
     (this.colors as any) = {};
     this.themeSchemeCSSClasses = [];
+  }
+
+  getCurrentTheme() {
+    return Theme.currentTheme;
   }
 
   /**

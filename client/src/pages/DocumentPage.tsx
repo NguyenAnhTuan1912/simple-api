@@ -16,7 +16,7 @@ import Dropdown from 'src/components/dropdown/Dropdown';
 import DocumentContent from 'src/components/document_content/DocumentContent';
 
 // Import route names
-import { RouteNames } from 'src/routenames';
+import { RouteNames } from 'src/routes.config';
 
 import { DocumentPageLocalState as __LOCALSTATE__ } from './states/DocumentPage';
 
@@ -31,7 +31,7 @@ function handleOnSelectItemDropdown(navigate: ReturnType<typeof useNavigate>, se
   setDocumentName(documentName);
 }
 
-const __DEFAULT_DOCUMENT_NAME = "general";
+const DEFAULT_DOCUMENT_NAME = "general";
 
 export default function DocumentPage() {
   const { documentOutline, documentOutlineDispatcher } = useDocumentOutline();
@@ -39,13 +39,13 @@ export default function DocumentPage() {
   const navigate = useNavigate();
 
   React.useEffect(function() {
-    documentOutlineDispatcher.getPlayerIDAsync();
+    documentOutlineDispatcher.getDocumentOutlineAsync();
   }, []);
 
   return (
     <ThreeColumnLayout
       leftSide={(
-        <div className="p-4">
+        <div className="p-4 overflow-y-auto">
           {
             documentOutline.data.map(function(data, index) {
               return (
@@ -54,7 +54,7 @@ export default function DocumentPage() {
                   title={data.title}
                   items={data.items}
                   topValue={data.value}
-                  selectedValue={state.documentName || __DEFAULT_DOCUMENT_NAME}
+                  selectedValue={state.documentName || DEFAULT_DOCUMENT_NAME}
                   onSelectItem={function(item) { handleOnSelectItemDropdown(navigate, stateFns.setDocumentName, item.value) }}
                   onSelectTop={function() { handleOnSelectItemDropdown(navigate, stateFns.setDocumentName) }}
                   renderItem={function(item) {
@@ -69,13 +69,13 @@ export default function DocumentPage() {
         </div>
       )}
       mainSide={(
-        <div className="max-w-[960px] mx-auto p-4">
-          <DocumentContent name={state.documentName ? state.documentName : __DEFAULT_DOCUMENT_NAME} />
+        <div className="min-h-[calc(100dvh-61px)] max-w-[960px] mx-auto p-4 overflow-y-auto">
+          <DocumentContent name={state.documentName ? state.documentName : DEFAULT_DOCUMENT_NAME} />
         </div>
       )}
       rightSide={(
-        <div className="p-4">
-          <h1>Tổng quan</h1>
+        <div className="p-4 overflow-y-auto">
+          <h1 className="font-bold uppercase">Nội dung</h1>
         </div>
       )}
     />

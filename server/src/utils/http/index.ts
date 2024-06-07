@@ -1,7 +1,8 @@
-import { Util } from "src/classes/util";
+import { Util } from "src/classes/Util";
 
 // Import types
 import type { HTTPStatus, HTTPResponse, HTTPMethods } from "src/types/http.types";
+import type { Interchange } from "src/types/data.types";
 
 export class HTTPUtil extends Util {
   static Methods = {
@@ -130,6 +131,13 @@ export class HTTPUtil extends Util {
     return Boolean(HTTPUtil.Methods[method]);
   }
 
+  /**
+   * Use this method to create a HTTP Data to response to client
+   * @param code 
+   * @param data 
+   * @param message 
+   * @returns 
+   */
   generateHTTPResponse<T>(code: number, data?: T, message?: string) {
     if(!Boolean(HTTPUtil.StatusCodes[code]))
       throw new Error(`[${code}] isn't a valid HTTP Code`);
@@ -155,5 +163,20 @@ export class HTTPUtil extends Util {
     }
 
     return responseObject;
+  }
+
+ /**
+  * Use this method to create an object for interchange data
+  * @param code 
+  * @param message 
+  * @param data 
+  * @returns 
+  */
+  generateInterchange<T>(code: number, message?: string, data?: T): Interchange<T> {
+    return {
+      code,
+      message: message ? message : null,
+      data: data ? data : null
+    }
   }
 }

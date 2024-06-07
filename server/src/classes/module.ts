@@ -1,23 +1,21 @@
 /**
  * Classes in this file are used for inheritance.
  */
-
-import { Utils } from "src/utils";
+import { Base } from "./Base";
 
 // Import types
 import type { Express } from "express";
-import type { Controller, MiddlewareFunction, HandlerFunction } from "./controller";
+import type { Controller, MiddlewareFunction, HandlerFunction } from "./Controller";
 import type { HTTPMethods } from "src/types/http.types";
 import type { Middlewares } from "src/middlewares";
 
-export class Module {
-  utils!: Utils;
-  base!: string;
-  controllers!: {[key: string]: Controller};
-  midws!: Middlewares;
+export class Module extends Base {
+  protected base!: string;
+  protected controllers!: {[key: string]: Controller};
+  protected midws!: Middlewares;
 
-  constructor(base: string, utils: Utils, midws: Middlewares) {
-    this.utils = utils;
+  constructor(base: string, midws: Middlewares) {
+    super();
     this.base = base;
     this.midws = midws;
     this.controllers = {};
@@ -38,12 +36,13 @@ export class Module {
   ) {
     let [method, name] = handlerName.split("::") as [HTTPMethods, string];
 
-    if(!this.utils.Http.isValidHTTPMethod(method) || !Boolean(app[method])) {
+    if(!this.utils.http.isValidHTTPMethod(method) || !Boolean(app[method])) {
       console.log(`  Endpoint - ${name} - has invalid http method`);
       return;
     }
 
-    let path = this.base + "/" + name;
+    if(name[0] !== "/" && name !== "") name = "/" + name;
+    let path = this.base + name;
 
     app[method](path, hander);
     console.log(`  Endpoint - ${path}, method: ${method} - Done`);

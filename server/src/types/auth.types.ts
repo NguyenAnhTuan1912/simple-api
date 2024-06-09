@@ -1,8 +1,4 @@
-type PermissionsAction = {
-  [K: string]: string;
-}
-
-export type Permissions = {
+export type Permission = {
   resources: Array<string>;
-  actions: PermissionsAction;
+  actions: string;
 }

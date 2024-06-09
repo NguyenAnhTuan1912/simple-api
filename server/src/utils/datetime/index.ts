@@ -2,7 +2,7 @@
 import { Util } from "src/classes/Util";
 
 export class DatetimeUtil extends Util {
-  static TimePrefixesRegex = /^(\d+)\s*(hours|days|minutes|seconds|h|d|m|s)$/g;
+  static TimePostfixesRegex = /^(\d+)\s*(hours|days|minutes|seconds|h|d|m|s)$/;
 
   constructor() {
     super();
@@ -14,7 +14,7 @@ export class DatetimeUtil extends Util {
    * the `timestamp` of __1 hour__ later.
    * 
    * Format of period:
-   *   - `<time><spaces><time prefix>`: time prefix can be `h`, `hours`, `m`, `minutes`, ...
+   *   - `<time><spaces><time postfix>`: time postfix can be `h`, `hours`, `m`, `minutes`, ...
    *   - A second as number.
    * 
    * Note: this method doesn't calculate time of past
@@ -25,15 +25,16 @@ export class DatetimeUtil extends Util {
     if(!period) return time;
     if(typeof period === "number") return time + (period * 1000);
     
-    let match = period.match(DatetimeUtil.TimePrefixesRegex);
+    let match = period.match(DatetimeUtil.TimePostfixesRegex);
    	if(match === null) {
       console.log(`The time string ${period} isn't a valid format`);
-      return;
+      return time;
     }
 
-    let timeValue = parseInt(match[1]), timePrefix = match[2];
+    let timeValue = parseInt(match[1]),
+        timePostfix = match[2];
 
-    switch(timePrefix) {
+    switch(timePostfix) {
 	    case "s":
       case "seconds": {
         time += timeValue * 1000;
@@ -61,6 +62,16 @@ export class DatetimeUtil extends Util {
     }
 
     return time;
+  }
+
+  /**
+   * This method get time string instead of timestamp
+   * @param period 
+   */
+  getTimeString(period?: string | number) {
+    let time = this.getTime(period);
+    let timeString = (new Date(time)).toLocaleString("vi-VN", { hour12: false }).split(" ")[0];
+    return timeString;
   }
 
   /**

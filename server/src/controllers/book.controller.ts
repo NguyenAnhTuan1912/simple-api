@@ -1,9 +1,11 @@
-import type { Request, Response } from "express";
-
 // Import classes
 import { Controller } from "../classes/Controller";
 
 // Import types
+import type { Request, Response } from "express";
+import type { Databases } from "src/databases";
+import type { Services } from "src/services";
+import type { Middlewares } from "src/middlewares";
 import type {
   Mongo_BookQuery,
   Mongo_BooksQuery,
@@ -16,17 +18,26 @@ import type {
   Mongo_BookAuthorModelData,
   Mongo_BookTypeModelData
 } from "src/databases/mongo/index.types";
+import type { Permission } from "src/types/auth.types";
 
 export class BookController extends Controller {
-  constructor(dbs: any, serv: any, midws: any) {
+  constructor(dbs: Databases, serv: Services, midws: Middlewares) {
     super(dbs, serv, midws);
 
     // Add middlewares
-    // this.buildWithMiddlewares("get::test", this.midws.Authorize.user);
+    this.buildWithMiddlewares("get::", this.midws.authorization.guest);
+    this.buildWithMiddlewares("get::/authors", this.midws.authorization.guest);
+    this.buildWithMiddlewares("get::/types", this.midws.authorization.guest);
+    this.buildWithMiddlewares("get::/:id", this.midws.authorization.guest);
+    this.buildWithMiddlewares("get::/authors/:id", this.midws.authorization.guest);
+    this.buildWithMiddlewares("get::/types/:id", this.midws.authorization.guest);
   }
 
   async ["get::"](req: Request, res: Response) {
-    return await this.handleErrorWithHTTPResponseAsResult<Mongo_BookResponseData[], this>(this, res, async function(o) {
+    return await this.handleResponseError<Mongo_BookResponseData[], this>(this, res, async function(o) {
+      if(!this.checkPermission(req, "book", (req as any).permission as Permission, o))
+        return o;
+
       let query = req.query as Mongo_BooksQuery;
       let result = await this.dbs.mongo.book.queryMultiply(query);
       
@@ -40,7 +51,9 @@ export class BookController extends Controller {
   }
 
   async ["get::/authors"](req: Request, res: Response) {
-    return await this.handleErrorWithHTTPResponseAsResult<Mongo_BookAuthorModelData[], this>(this, res, async function(o) {
+    return await this.handleResponseError<Mongo_BookAuthorModelData[], this>(this, res, async function(o) {
+      this.checkPermission(req, "author", (req as any).permission as Permission, o);
+
       let query = req.query as Mongo_BookAuthorQuery;
       let result = await this.dbs.mongo.bookAuthor.queryMultiply(query);
 
@@ -54,7 +67,10 @@ export class BookController extends Controller {
   }
 
   async ["get::/types"](req: Request, res: Response) {
-    return await this.handleErrorWithHTTPResponseAsResult<Mongo_BookTypeModelData[], this>(this, res, async function(o) {
+    return await this.handleResponseError<Mongo_BookTypeModelData[], this>(this, res, async function(o) {
+      if(!this.checkPermission(req, "book_type", (req as any).permission as Permission, o))
+        return o;
+
       let query = req.query as Mongo_BookTypeQuery;
       let result = await this.dbs.mongo.bookType.queryMultiply(query);
 
@@ -71,7 +87,10 @@ export class BookController extends Controller {
   /// ALL THE ROUTE HAS /: WILDCARD WILL BE DEFINED HERE
   ///
   async ["get::/:id"](req: Request, res: Response) {
-    return await this.handleErrorWithHTTPResponseAsResult<Mongo_BookResponseData, this>(this, res, async function(o) {
+    return await this.handleResponseError<Mongo_BookResponseData, this>(this, res, async function(o) {
+      if(!this.checkPermission(req, "book", (req as any).permission as Permission, o))
+        return o;
+
       let query = req.query as Mongo_BookQuery;
       let params = req.params as Mongo_BookParams;
       let result = await this.dbs.mongo.book.query(query, params);
@@ -86,7 +105,10 @@ export class BookController extends Controller {
   }
 
   async ["get::/authors/:id"](req: Request, res: Response) {
-    return await this.handleErrorWithHTTPResponseAsResult<Mongo_BookAuthorModelData, this>(this, res, async function(o) {
+    return await this.handleResponseError<Mongo_BookAuthorModelData, this>(this, res, async function(o) {
+      if(!this.checkPermission(req, "author", (req as any).permission as Permission, o))
+        return o;
+
       let query = req.query as Mongo_BookAuthorQuery;
       let params = req.params as Mongo_BookAuthorParams;
       let result = await this.dbs.mongo.bookAuthor.query(query, params);
@@ -101,7 +123,10 @@ export class BookController extends Controller {
   }
 
   async ["get::/types/:id"](req: Request, res: Response) {
-    return await this.handleErrorWithHTTPResponseAsResult(this, res, async function(o) {
+    return await this.handleResponseError(this, res, async function(o) {
+      if(!this.checkPermission(req, "book_type", (req as any).permission as Permission, o))
+        return o;
+
       let query = req.query as Mongo_BookTypeQuery;
       let params = req.params as Mongo_BookTypeParams;
       let result = await this.dbs.mongo.bookType.query(query, params);

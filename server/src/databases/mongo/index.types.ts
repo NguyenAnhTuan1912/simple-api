@@ -1,6 +1,9 @@
 ///
 /// DEFINE DATA STRUCTURE OF OBJECT
 ///
+import type { Db } from "mongodb";
+export type MongoDB = Db;
+
 export type Mongo_ExampleModelData = {
   _id?: string;
   name: string;
@@ -10,18 +13,20 @@ export type Mongo_ExampleModelData = {
 export type Mongo_TokenModelData = {
   _id?: string;
   value: string;
-  expire: number;
 }
 
 export type Mongo_TokenContentData = {
   role: string;
-  credential: string;
+  expire: number;
+  provider: string;
+  actions: string;
 }
 
 export type Mongo_UserRoleModelData = {
   _id?: string;
   name: string;
   rights: string;
+  resources: Array<string>;
 }
 
 export type Mongo_UserModelData = {

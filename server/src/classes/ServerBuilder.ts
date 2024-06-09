@@ -2,6 +2,9 @@ import type { MyServer } from "./MyServer";
 import type { Module } from "./Module";
 import type { Databases } from "src/databases";
 
+/**
+ * A server builder, used to build databases, global middlewares, modules, ...
+ */
 export class ServerBuilder {
   private __isModulesBuilt!: boolean;
   private __isMiddlewaresBuilt!: boolean;

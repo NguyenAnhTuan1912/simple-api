@@ -9,10 +9,14 @@ import { Base } from "./Base";
 
 // Import types
 import type { IDatabase } from "src/types/database.types";
-import type { Utils } from "src/utils";
 import type { ObjectSchema } from "joi";
 
-export class Database<Instances, Utils> extends Base implements IDatabase {
+/**
+ * A database Manager
+ */
+export class Database<Instances, Utils> extends Base
+  implements IDatabase
+{
   protected instances!: Instances;
   protected localUtils!: Utils;
 
@@ -28,15 +32,25 @@ export class Database<Instances, Utils> extends Base implements IDatabase {
   }
 }
 
-export class Model<T> extends Base {
+export class Model<D, T> extends Base {
   protected schema!: ObjectSchema<T>;
+  protected db!: D;
+  protected name!: string;
 
-  constructor() {
+  constructor(db: D, name: string) {
     super();
+    this.db = db;
+    this.name = name;
   }
 
   async validateDataAsync(data: T) {
     return this.schema.validateAsync(data);
+  }
+
+  protected getCollection<D, C extends (...args: any[]) => void>
+  (get: C) {
+    let collection = get(this.db, this.name) as ReturnType<C>;
+    return collection;
   }
 
   getFields() {

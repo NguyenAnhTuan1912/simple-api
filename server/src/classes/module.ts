@@ -9,6 +9,9 @@ import type { Controller, MiddlewareFunction, HandlerFunction } from "./Controll
 import type { HTTPMethods } from "src/types/http.types";
 import type { Middlewares } from "src/middlewares";
 
+/**
+ * A base class of module
+ */
 export class Module extends Base {
   protected base!: string;
   protected controllers!: {[key: string]: Controller};
@@ -29,7 +32,7 @@ export class Module extends Base {
    * @param hander 
    * @returns 
    */
-  appendHandler(
+  private __appendHandler(
     app: Express,
     handlerName: string,
     hander: HandlerFunction | Array<MiddlewareFunction | HandlerFunction>
@@ -46,6 +49,27 @@ export class Module extends Base {
 
     app[method](path, hander);
     console.log(`  Endpoint - ${path}, method: ${method} - Done`);
+  }
+
+  private __buildHandler(app: Express, name: string) {
+    let handlerNames = Object.getOwnPropertyNames(Object.getPrototypeOf(this.controllers[name]));
+    for(const handlerName of handlerNames) {
+      if(
+        // Isn't function or constructor
+        typeof (this.controllers[name] as any)[handlerName] !== "function"
+        || handlerName === "constructor"
+      ) continue;
+
+      this.__appendHandler(app, handlerName, (this.controllers[name] as any)[handlerName]);
+      delete (this.controllers[name] as any)[handlerName];
+    }
+  }
+
+  private __buildHandlerWithMiddlewares(app: Express, name: string) {
+    let withMiddlewaresEntries = this.controllers[name].withMiddlewares.entries();
+    for(const [handlerName, handler] of withMiddlewaresEntries) {
+      this.__appendHandler(app, handlerName, handler);
+    }
   }
 
   /**
@@ -77,26 +101,12 @@ export class Module extends Base {
     
     for(const controllerName of controllerNames) {
       console.log(`Status - ${controllerName} - Building...`);
-      let handlerNames = Object.getOwnPropertyNames(Object.getPrototypeOf(this.controllers[controllerName]));
 
       // "Without middlewares" handlers
-      for(const handlerName of handlerNames) {
-        if(
-          // Isn't function or constructor
-          typeof (this.controllers[controllerName] as any)[handlerName] !== "function"
-          || handlerName === "constructor"
-        ) continue;
-
-        this.appendHandler(app, handlerName, (this.controllers[controllerName] as any)[handlerName]);
-        delete (this.controllers[controllerName] as any)[handlerName];
-      }
+      this.__buildHandler(app, controllerName);
 
       // "With middlewares" handlers
-      let withMiddlewaresEntries = this.controllers[controllerName].withMiddlewares.entries();
-      
-      for(const [handlerName, handler] of withMiddlewaresEntries) {
-        this.appendHandler(app, handlerName, handler);
-      }
+      this.__buildHandlerWithMiddlewares(app, controllerName);
 
       console.log(`Status - ${controllerName} - Done`);
     }

@@ -7,42 +7,43 @@ import { Model } from "src/classes/Database";
 import { AppSettings } from "src/settings";
 
 // Import types
-import type { Db } from "mongodb";
+import type { MongoDB } from "../index.types";
 import type { IModel } from "src/types/database.types";
 import type {
   Mongo_TokenModelData
 } from "../index.types";
-import type { Utils } from "src/utils";
 import type { MongoUtils } from "../utils";
 import type { Mongo_Instances, Mongo_DBInformations } from "..";
+import { Interchange } from "src/types/data.types";
 
-export class TokenModel extends Model<Mongo_TokenModelData> implements IModel<Mongo_TokenModelData> {
-  protected db!: Db;
-  private __dbInfo!: Mongo_DBInformations;
+export class TokenModel
+  extends Model<MongoDB, Mongo_TokenModelData>
+  implements IModel<Mongo_TokenModelData>
+{
   private __localUtils!: MongoUtils;
+  private __dbInfo!: Mongo_DBInformations;
 
   constructor(
     mongos: Mongo_Instances,
     localUtils: MongoUtils,
     dbInformations: Mongo_DBInformations
   ) {
-    super();
+    super(mongos.SIMPLE_API.db(dbInformations.USER.NAME), dbInformations.USER.OBJECTS.TOKEN);
     this.schema = Joi.object<Mongo_TokenModelData>({
       value: Joi.string().required()
     });
-    this.__dbInfo = dbInformations;
     this.__localUtils = localUtils;
-    this.db = mongos.SIMPLE_API.db(this.__dbInfo.USER.NAME);
+    this.__dbInfo = dbInformations;
   }
 
   private __getCollection() {
-    return this.__localUtils.getCollection<Mongo_TokenModelData>(this.db, this.__dbInfo.USER.OBJECTS.TOKEN);
+    return super.getCollection(this.__localUtils.getCollection<Mongo_TokenModelData>);
   }
 
   async query(...args: [string]) {
     const __collection = this.__getCollection();
     
-    return await this.handleErrorWithInterchangeAsResult<Mongo_TokenModelData, this>(this, async function(o) {
+    return await this.handleInterchangeError<Mongo_TokenModelData, this>(this, async function(o) {
       const pipeline = [];
 
       // If request has params
@@ -59,17 +60,30 @@ export class TokenModel extends Model<Mongo_TokenModelData> implements IModel<Mo
     });
   }
 
-  async create(...args: [string, number]) {
+  async create(...args: [string]) {
     const __collection = this.__getCollection();
     
-    return await this.handleErrorWithInterchangeAsResult<Mongo_TokenModelData, this>(this, async function(o) {
-      let tokenValue = args[0], expire = args[1];
-      let token = { value: tokenValue, expire };
+    return await this.handleInterchangeError<Mongo_TokenModelData, this>(this, async function(o) {
+      let token = { value: args[0] };
       let result = await __collection.insertOne(token);
 
       if(!result) throw new Error(`The token isn't created successfully`);
 
       o.data = token as Mongo_TokenModelData;
+      o.message = "Create token successfully";
+      
+      return o;
+    })
+  }
+  
+  async delete(...args: [string]) {
+    const __collection = this.__getCollection();
+    
+    return await this.handleInterchangeError<Mongo_TokenModelData, this>(this, async function(o) {
+      let result = await __collection.deleteOne({ value: args[0] });
+
+      if(!result) throw new Error(`The token doesn't exist`);
+
       o.message = "Create token successfully";
       
       return o;

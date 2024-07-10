@@ -1,4 +1,8 @@
+// Import settings
+import { AppSettings } from "./settings"
+
 export const AuthSettings = {
+  PROVIDER: AppSettings.SERCURITY.AUTH_PROVIDER,
   ROLES: {
     USER: "user",
     GUEST: "guest",
@@ -6,11 +10,7 @@ export const AuthSettings = {
     EDITOR: "editor"
   },
   EXPIRATION: {
-    _DEFAULT: "1m" // 1 Minutes
+    _DEFAULT: { value: "1", postfix: "m" } // 1 Minutes
   },
-  LIMITATIONS: {
-    USER: "user",
-    GUEST: "guest",
-    EDITOR: "editor"
-  }
+  RIGHTS: AppSettings.SERCURITY.RESOURCE_ACCESS_RIGHTS
 }

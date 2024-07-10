@@ -1,13 +1,10 @@
-import Joi, { ObjectSchema } from "joi";
+import Joi from "joi";
 
 // Import classes
 import { Model } from "src/classes/Database";
 
-// Import mongodb settings
-import { AppSettings } from "src/settings";
-
 // Import types
-import type { Db } from "mongodb";
+import type { MongoDB } from "../index.types";
 import type { IModel } from "src/types/database.types";
 import type {
   Mongo_BookResponseData,
@@ -19,17 +16,19 @@ import type {
 import type { MongoUtils } from "../utils";
 import type { Mongo_Instances, Mongo_DBInformations } from "..";
 
-export class BookModel extends Model<Mongo_BookModelData> implements IModel<Mongo_BookResponseData> {
-  protected db!: Db;
-  private __dbInfo!: Mongo_DBInformations;
+export class BookModel
+  extends Model<MongoDB, Mongo_BookModelData>
+  implements IModel<Mongo_BookResponseData>
+{
   private __localUtils!: MongoUtils;
+  private __dbInfo!: Mongo_DBInformations;
 
   constructor(
     mongos: Mongo_Instances,
     localUtils: MongoUtils,
     dbInformations: Mongo_DBInformations
   ) {
-    super();
+    super(mongos.SIMPLE_API.db(dbInformations.BOOK.NAME), dbInformations.BOOK.NAME);
     this.schema = Joi.object<Mongo_BookModelData>({
       typeIds: Joi.array().items(Joi.string()).default([]),
       authorId: Joi.string().required(),
@@ -37,19 +36,18 @@ export class BookModel extends Model<Mongo_BookModelData> implements IModel<Mong
       desc: Joi.string().required(),
       imgs: Joi.array().items(Joi.string()).default([])
     });
-    this.__dbInfo = dbInformations;
     this.__localUtils = localUtils;
-    this.db = mongos.SIMPLE_API.db(this.__dbInfo.BOOK.NAME);
+    this.__dbInfo = dbInformations;
   }
 
   private __getCollection() {
-    return this.__localUtils.getCollection<Mongo_BookModelData>(this.db, this.__dbInfo.BOOK.OBJECTS.BOOK);
+    return super.getCollection(this.__localUtils.getCollection<Mongo_BookResponseData>);
   }
 
   async query(...args: [Mongo_BookQuery?, Mongo_BookParams?]) {
     const __collection = this.__getCollection();
 
-    return await this.handleErrorWithInterchangeAsResult<Mongo_BookResponseData, this>(this, async function(o) {
+    return await this.handleInterchangeError<Mongo_BookResponseData, this>(this, async function(o) {
       const pipeline = [];
 
       // If request has params
@@ -92,7 +90,7 @@ export class BookModel extends Model<Mongo_BookModelData> implements IModel<Mong
   async queryMultiply(...args: [Mongo_BooksQuery, Mongo_BookParams?]) {
     const __collection = this.__getCollection();
     
-    return await this.handleErrorWithInterchangeAsResult<Mongo_BookResponseData[], this>(this, async function(o) {
+    return await this.handleInterchangeError<Mongo_BookResponseData[], this>(this, async function(o) {
       const pipeline = [];
 
       // If request has queries

@@ -9,7 +9,7 @@ type MyServerSettings = {
 };
 
 /**
- * Use this class to create an instance to manage server.
+ * A server manager
  */
 export class MyServer {
   app!: Express;

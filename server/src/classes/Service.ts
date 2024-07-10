@@ -6,6 +6,9 @@ import { Base } from "./Base";
 // Import types
 import type { Databases } from "src/databases";
 
+/**
+ * A base class of service
+ */
 export class Service extends Base {
   protected dbs!: Databases;
 

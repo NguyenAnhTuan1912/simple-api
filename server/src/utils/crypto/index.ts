@@ -33,7 +33,7 @@ export class CryptoUtil extends Util {
     this.__iv = AppSettings.SERCURITY.IV;
   }
 
-  encrypt(value: any) {
+  encrypt(value: string) {
     const cipher = crypto.createCipheriv(this.__algorithm, this.__key, this.__iv);
     let encryptedData = cipher.update(value, 'utf-8', 'hex');
 

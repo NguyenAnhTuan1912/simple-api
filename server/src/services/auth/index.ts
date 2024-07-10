@@ -5,9 +5,9 @@ import { Service } from "src/classes/Service";
 import { AuthSettings } from "src/auth.settings";
 
 // Import types
-import type { Permissions } from "src/types/auth.types";
+import type { Permission } from "src/types/auth.types";
 import type { Databases } from "src/databases";
-import type { Mongo_TokenModelData, Mongo_TokenContentData } from "src/databases/mongo/index.types";
+import type { Mongo_TokenContentData } from "src/databases/mongo/index.types";
 
 export class AuthService extends Service {
   constructor(dbs: Databases) {
@@ -15,48 +15,38 @@ export class AuthService extends Service {
   }
 
   /**
-   * Use this method to create a expire time for a token. `time` can be:
-   *   - A string with format `<time><spaces><time prefix>`. If `time prefix` isn't provided,
-   * `time prefix` will be set to `hours` or `h`.
-   *   - A number, that means `time` is hours.
-   *   - Undefined, that meas `time` will be set to default.
-   * @param time 
-   */
-  private __createExpiration(time?: string | number) {
-    return this.utils.datetime.getTime(time || AuthSettings.EXPIRATION._DEFAULT);
-  }
-
-  /**
-   * 
+   * Use this method to verify token
    * @param tokenInHeaders 
    * @returns 
    */
   async verifyToken(tokenInHeaders?: string) {
-    let code = 1;
-    let data: Mongo_TokenContentData | null = null;
-    let message = "";
-
-    try {
+    return await this.handleInterchangeError<Mongo_TokenContentData, this>(this, async function(o) {
       if(!tokenInHeaders) throw new Error("Toke is required");
 
       const [, token] = tokenInHeaders?.split(" ");
 
-      const tokenModelDataResult = await this.dbs.mongo.token.query(token);
-      if(!tokenModelDataResult.code || !tokenModelDataResult.data) throw new Error("Token doesn't exist. It probably isn't created");
-
-      let expire = tokenModelDataResult.data.expire;
-      let now = Date.now();
-
-      if(expire >= now) throw new Error("The token is expired");
+      if(!token) throw new Error("Token isn't found");
+      if(!((await this.dbs.mongo.token.query(token)).code)) throw new Error("Token isn't found");
       
-      data = JSON.parse(this.utils.crypto.decrypt(tokenModelDataResult.data.value)) as Mongo_TokenContentData;
-      message = "Token is valid";
-    } catch (error: any) {
-      code = 0;
-      message = error.message;
-    } finally {
-      return this.utils.http.generateInterchange(code, message, data);
-    }
+      let tokenPayload: Mongo_TokenContentData = JSON.parse(this.utils.crypto.decrypt(token));
+      let expire = tokenPayload.expire;
+      let now = Date.now();
+      
+      // 1. Check provider
+      if(tokenPayload.provider !== AuthSettings.PROVIDER)
+        throw new Error("The token provider isn't valid");
+      
+      // 2. Check expiration
+      if(expire <= now) {
+        await this.dbs.mongo.token.delete(token);
+        throw new Error("The token is expired");
+      }
+
+      o.data = tokenPayload;
+      o.message = "Token is valid";
+
+      return o;
+    });
   }
 
   /**
@@ -65,46 +55,51 @@ export class AuthService extends Service {
    * @param credential 
    * @returns 
    */
-  createToken(role: string, expire?: string | number, credential?: string) {
-    return [this.utils.crypto.encrypt(JSON.stringify({ role, credential })), this.__createExpiration(expire)];
-  }
-
-  checkPermission() {
+  async createToken(role: string) {
+    let period = this.utils.datetime.getTime(
+      AuthSettings.EXPIRATION._DEFAULT.value +
+      AuthSettings.EXPIRATION._DEFAULT.postfix
+    );
+    let roleResult = await this.dbs.mongo.userRole.query(role);
     
+    if(!roleResult.code)
+      throw new Error("Invalid role");
+
+    let tokenPayload: Mongo_TokenContentData = {
+      role: role,
+      expire: period,
+      provider: AuthSettings.PROVIDER!,
+      actions: roleResult.data!.rights
+    };
+
+    let token = this.utils.crypto.encrypt(JSON.stringify(tokenPayload));
+
+    return token;
   }
 
   /**
-   * 
-   * @param role 
+   * Use this method to create permission
    * @param rights 
    * @returns 
    */
-  generatePermission(role: string, rights: string) {
-    let code = 1;
-    let data: Permissions | null = null;
-    let message = "";
-
-    try {
-      if(!role && !rights) throw new Error("Role and rights are required");
-      data = {
+  generatePermission(rights: string) {
+    return this.handleInterchangeError<Permission, this>(this, function(o) {
+      o.data = {
         resources: [],
-        actions: {}
-      }
-    } catch (error: any) {
-      code = 0;
-      message = error.message;
-    } finally {
-      return this.utils.http.generateInterchange(code, message, data);
-    }
+        actions: rights
+      };
+      
+      return o;
+    });
   }
 
   /**
    * 
    * @param query 
-   * @param permissions 
+   * @param permission
    * @returns 
    */
-  generateLimitations<T>(query: T, permissions: Permissions) {
+  generateLimitations<T>(query: T, permission: Permission) {
     let code = 1;
     let data: Mongo_TokenContentData | null = null;
     let message = "";
@@ -117,15 +112,6 @@ export class AuthService extends Service {
     } finally {
       return this.utils.http.generateInterchange(code, message, data);
     }
-  }
-
-  checkGuest(role: string) {
-    return (
-      role === AuthSettings.ROLES.GUEST ||
-      this.checkUser(role) ||
-      this.checkEditor(role) ||
-      this.checkAdmin(role)
-    );
   }
 
   checkUser(role: string) {

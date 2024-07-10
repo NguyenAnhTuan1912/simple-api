@@ -1,17 +1,17 @@
 import { Module } from "src/classes/Module";
 
-import { BookController } from "src/controllers/book.controller";
+import { TokenController } from "src/controllers/token.controller";
 
 // Import types
 import type { Databases } from "src/databases";
 import type { Services } from "src/services";
 import type { Middlewares } from "src/middlewares";
 
-export class BookModule extends Module {
+export class AuthModule extends Module {
   constructor(dbs: Databases, serv: Services, midws: Middlewares) {
-    super("/books", midws);
+    super("/auth", midws);
     this.controllers = {
-      book: new BookController(dbs, serv, midws)
+      token: new TokenController(dbs, serv, midws)
     };
   }
 }

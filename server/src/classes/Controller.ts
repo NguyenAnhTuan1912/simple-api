@@ -3,26 +3,25 @@
  */
 import { Base } from "./Base";
 
+// Import settings
+import { AuthSettings } from "src/auth.settings";
+
 // Import types
 import type { Request, Response, NextFunction } from "express";
 import type { Databases } from "src/databases";
 import type { Services } from "src/services";
 import type { Middlewares } from "src/middlewares";
-import type { Permissions } from "src/types/auth.types";
+import type { Permission } from "src/types/auth.types";
 import type { HTTPResponse } from "src/types/http.types";
 
 export type HandlerFunction = (req: Request, res: Response, next?: NextFunction) => any;
 export type MiddlewareFunction = (req: Request, res: Response, next: NextFunction) => any;
 
+/**
+ * A handlers manager
+ */
 export class Controller extends Base {
   static ReservedMethods = ["constructor", "buildWithMiddlewares"];
-  static MethodsToActions = {
-    GET: "read",
-    POST: "write",
-    PATCH: "update",
-    PUT: "updateFull",
-    DELETE: "delete"
-  };
 
   protected dbs!: Databases;
   protected serv!: Services;
@@ -48,22 +47,22 @@ export class Controller extends Base {
    * @param resource 
    * @param permissions 
    */
-  checkPermissions<T>(
+  checkPermission<T>(
     req: Request,
     resource: string,
-    permissions: Permissions,
+    permission: Permission,
     result: HTTPResponse<T>
   ) {
-    result.error!.code = 403;
-
-    if(!permissions.resources.includes(resource))
+    if(!permission.resources.includes(resource)) {
+      result.code = 403;
       throw new Error("You don't have any permissions to use this resource");
+    }
 
-    let allowedActions = Controller.MethodsToActions[req.method as keyof typeof Controller.MethodsToActions];
-    let checkActions = Boolean(permissions.actions[allowedActions]);
-    
-    if(!checkActions)
+    let allowedAction = AuthSettings.RIGHTS[req.method as keyof typeof AuthSettings.RIGHTS]!;
+    if(!permission.actions.includes(allowedAction)) {
+      result.code = 403;
       throw new Error("You don't have any permissions to do this action");
+    }
 
     return true;
   }

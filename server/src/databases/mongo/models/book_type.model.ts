@@ -7,7 +7,7 @@ import { Model } from "src/classes/Database";
 import { AppSettings } from "src/settings";
 
 // Import types
-import type { Db } from "mongodb";
+import type { MongoDB } from "../index.types";
 import type { IModel } from "src/types/database.types";
 import type {
   Mongo_BookTypeModelData,
@@ -18,34 +18,35 @@ import type {
 import type { MongoUtils } from "../utils";
 import type { Mongo_Instances, Mongo_DBInformations } from "..";
 
-export class BookTypeModel extends Model<Mongo_BookTypeModelData> implements IModel<Mongo_BookTypeModelData> {
-  protected db!: Db;
-  private __dbInfo!: Mongo_DBInformations;
+export class BookTypeModel
+  extends Model<MongoDB, Mongo_BookTypeModelData>
+  implements IModel<Mongo_BookTypeModelData>
+{
   private __localUtils!: MongoUtils;
+  private __dbInfo!: Mongo_DBInformations;
 
   constructor(
     mongos: Mongo_Instances,
     localUtils: MongoUtils,
     dbInformations: Mongo_DBInformations
   ) {
-    super();
+    super(mongos.SIMPLE_API.db(dbInformations.BOOK.NAME), dbInformations.BOOK.OBJECTS.TYPE);
     this.schema = Joi.object<Mongo_BookTypeModelData>({
       name: Joi.string().required(),
       value: Joi.string().required()
     });
-    this.__dbInfo = dbInformations;
     this.__localUtils = localUtils;
-    this.db = mongos.SIMPLE_API.db(this.__dbInfo.BOOK.NAME);
+    this.__dbInfo = dbInformations;
   }
 
   private __getCollection() {
-    return this.__localUtils.getCollection<Mongo_BookTypeModelData>(this.db, this.__dbInfo.BOOK.OBJECTS.TYPE);
+    return super.getCollection(this.__localUtils.getCollection<Mongo_BookTypeModelData>);
   }
 
   async query(...args: [Mongo_BookTypeQuery?, Mongo_BookTypeParams?]) {
     const __collection = this.__getCollection();
 
-    return await this.handleErrorWithInterchangeAsResult<Mongo_BookTypeModelData, this>(this, async function(o) {
+    return await this.handleInterchangeError<Mongo_BookTypeModelData, this>(this, async function(o) {
       const pipeline = [];
 
       // If request has params
@@ -79,7 +80,7 @@ export class BookTypeModel extends Model<Mongo_BookTypeModelData> implements IMo
   async queryMultiply(...args: [Mongo_BookTypesQuery, Mongo_BookTypeParams?]) {
     const __collection = this.__getCollection();
 
-    return await this.handleErrorWithInterchangeAsResult<Mongo_BookTypeModelData[], this>(this, async function(o) {
+    return await this.handleInterchangeError<Mongo_BookTypeModelData[], this>(this, async function(o) {
       const pipeline = [];
 
       // If request has queries

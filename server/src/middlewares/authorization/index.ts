@@ -5,10 +5,29 @@ import { AuthSettings } from "src/auth.settings";
 
 // Import types
 import type { Request, Response, NextFunction } from "express";
+import type { Mongo_UserRoleModelData } from "src/databases/mongo/index.types";
 
 export class AuthorizationMiddleware extends Middleware {
+  cachedRoles!: Map<string, Mongo_UserRoleModelData>;
+
   constructor(dbs: any, serv: any) {
     super(dbs, serv);
+    this.cachedRoles = new Map();
+  }
+
+  async __getRoleData(role: string) {
+    let roleData = this.cachedRoles.get(role);
+    if(!roleData) {
+      let _ = await this.dbs.mongo.userRole.query(role);
+      roleData = _.data!;
+
+      if(!_.code)
+        throw new Error(_.message!);
+
+      this.cachedRoles.set(role, roleData!);
+    }
+
+    return roleData;
   }
 
   /**
@@ -24,22 +43,30 @@ export class AuthorizationMiddleware extends Middleware {
     let message = null;
 
     try {
-      const bearerToken = req.headers.authorization;
-      const verifiedToken = await this.serv.auth.verifyToken(bearerToken);
+      if(req.headers.authorization) {
+        const bearerToken = req.headers.authorization;
+        const verificationResult = await this.serv.auth.verifyToken(bearerToken);
 
-      const role = verifiedToken.code ? verifiedToken.data!.role : AuthSettings.ROLES.GUEST;
+        if(!verificationResult.code) {
+          code = 401;
+          throw new Error(verificationResult.message!);
+        }
 
-      const roleModelData = await this.dbs.mongo.userRole.query(role);
-      if(!roleModelData.code) {
-        code = 403;
-        throw new Error(roleModelData.message!);
+        const payload = verificationResult.data!;
+        const roleData = await this.__getRoleData(payload.role);
+        (req as any).permission = {
+          actions: roleData.rights,
+          resources: roleData.resources
+        };
+
+        return next();
       }
 
-      const { name, rights } = roleModelData.data!;
-      const permissions = this.serv.auth.generatePermission(name, rights);
-      const limitations = this.serv.auth.generateLimitations(req.query, permissions.data!);
-
-      (req as any).limitations = limitations;
+      const roleData = await this.__getRoleData("guest");
+      (req as any).permission = {
+        actions: roleData.rights,
+        resources: roleData.resources
+      };
 
       return next();
     } catch (error: any) {
@@ -54,28 +81,25 @@ export class AuthorizationMiddleware extends Middleware {
 
     try {
       const bearerToken = req.headers.authorization;
-      const verifiedToken = await this.serv.auth.verifyToken(bearerToken);
-      if(!verifiedToken.code) {
+      const verificationResult = await this.serv.auth.verifyToken(bearerToken);
+
+      if(!verificationResult.code) {
         code = 401;
-        throw new Error(verifiedToken.message!);
+        throw new Error(verificationResult.message!);
       }
 
-      let role = verifiedToken.data!.role;
-      if(!this.serv.auth.checkUser(role)) {
+      const payload = verificationResult.data!;
+      if(!this.serv.auth.checkUser(payload.role)) {
         code = 403;
-        throw new Error(`${role} doesn't have any permission to do this action`);
+        throw new Error(`${payload.role} doesn't have any permission to do this action`);
       }
 
-      const roleModelData = await this.dbs.mongo.userRole.query(role);
-      if(!roleModelData.code) {
-        code = 403;
-        throw new Error(roleModelData.message!);
-      }
-
-      const { name, rights } = roleModelData.data!;
-      const permissions = this.serv.auth.generatePermission(name, rights);
-
-      (req as any).permissions = permissions;
+      const roleData = await this.__getRoleData(payload.role);
+          
+      (req as any).permission = {
+        actions: payload.actions,
+        resources: roleData.resources
+      };
 
       return next();
     } catch (error: any) {

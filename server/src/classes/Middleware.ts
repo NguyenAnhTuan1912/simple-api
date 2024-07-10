@@ -4,6 +4,9 @@ import { Base } from "./Base";
 import type { Databases } from "src/databases";
 import type { Services } from "src/services";
 
+/**
+ * A base class of middleware
+ */
 export class Middleware extends Base {
   dbs!: Databases;
   serv!: Services;

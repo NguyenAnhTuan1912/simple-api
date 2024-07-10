@@ -6,9 +6,18 @@ dotenv.config({ path: [".env", `.env.${process.env.NODE_ENV}`] });
 export const AppSettings = {
   PORT: process.env.PORT || "7500",
   SERCURITY: {
+    AUTH_PROVIDER: process.env.AUTH_PROVIDER,
     ALGORITHM: process.env.CRYPTOGRAPHY_ALGORITHM,
     KEY: process.env.CRYPTOGRAPHY_KEY,
-    IV: process.env.CRYPTOGRAPHY_IV
+    IV: process.env.CRYPTOGRAPHY_IV,
+    RESOURCE_ACCESS_RIGHTS: {
+      FULL: process.env.FULL_RIGHT,
+      GET: process.env.GET_RIGHT,
+      POST: process.env.POST_RIGHT,
+      PUT: process.env.PUT_N_PATCH_RIGHT,
+      PATCH: process.env.PUT_N_PATCH_RIGHT,
+      DELETE: process.env.DELETE_RIGHT,
+    }
   },
   /**
    * Settings for MongoDBs, this include many clusers, each cluser has many database...
